@@ -29,6 +29,17 @@ const studentSchema = new mongoose.Schema({
 
     // Meta
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
+    wishlistCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+    courseProgress: [{
+        course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+        progress: { type: Number, default: 0 },
+        completed: { type: Boolean, default: false },
+        lastAccessed: { type: Date, default: Date.now }
+    }],
+    subscription: {
+        plan: { type: String, enum: ['free', 'premium'], default: 'free' },
+        expiresAt: { type: Date }
+    },
     isProfileComplete: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
     notifications: [{

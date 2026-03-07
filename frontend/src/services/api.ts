@@ -7,7 +7,7 @@ const api = axios.create({
 
 // Attach JWT token to every request
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || localStorage.getItem('instructorToken');
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
@@ -75,6 +75,46 @@ export const adminAPI = {
     getAllJobs: () => api.get('/admin/jobs'),
     getAllApplications: () => api.get('/admin/applications'),
     seedAdmin: () => api.post('/admin/seed'),
+};
+
+// ─── SKILL UP ─────────────────────────────────────────────────────────────────
+export const skillAPI = {
+    searchCourses: (params?: object) => api.get('/skills/courses', { params }),
+    getCourseDetails: (id: string) => api.get(`/skills/courses/${id}`),
+    enrollCourse: (id: string) => api.post(`/skills/courses/${id}/enroll`),
+    upgradeSubscription: (data: object) => api.post('/skills/subscription/upgrade', data),
+    toggleWishlist: (courseId: string) => api.post('/skills/courses/wishlist', { courseId }),
+    updateProgress: (data: { courseId: string; progress: number; completed: boolean }) => api.post('/skills/courses/progress', data),
+    seedCourses: () => api.post('/skills/courses/seed'),
+    // Queries
+    getQueries: () => api.get('/skills/queries'),
+    createQuery: (data: { courseId: string; subject: string; text: string }) => api.post('/skills/queries', data),
+    replyToQuery: (id: string, text: string) => api.post(`/skills/queries/${id}/reply`, { text }),
+};
+
+// ─── INSTRUCTOR PORTAL ────────────────────────────────────────────────────────
+export const instructorAPI = {
+    register: (data: object) => api.post('/auth/instructor/register', data),
+    login: (data: object) => api.post('/auth/instructor/login', data),
+    getProfile: () => api.get('/instructor/profile'),
+    getMyCourses: () => api.get('/instructor/courses'),
+    submitCourse: (data: object) => api.post('/instructor/courses', data),
+    updateCourse: (id: string, data: object) => api.put(`/instructor/courses/${id}`, data),
+    updateCurriculum: (id: string, data: { modules?: any[], resources?: any[], mockTests?: any[] }) =>
+        api.put(`/instructor/courses/${id}`, data),
+    deleteCourse: (id: string) => api.delete(`/instructor/courses/${id}`),
+    updateProfile: (data: any) => api.put('/instructor/profile', data),
+    getEnrolledStudents: () => api.get('/instructor/students'),
+    getQueries: () => api.get('/instructor/queries'),
+    replyToQuery: (id: string, data: { text?: string; status?: string }) => api.put(`/instructor/queries/${id}/reply`, data),
+};
+
+// ─── ADMIN COURSE REVIEW ──────────────────────────────────────────────────────
+export const adminCourseAPI = {
+    getPendingCourses: (status?: string) => api.get('/admin/pending-courses', { params: { status } }),
+    reviewCourse: (id: string, status: string) => api.put(`/admin/review-course/${id}`, { status }),
+    getInstructors: () => api.get('/admin/instructors'),
+    verifyInstructor: (id: string, isVerified: boolean) => api.put(`/admin/instructors/${id}/verify`, { isVerified }),
 };
 
 // ─── PUBLIC JOBS ──────────────────────────────────────────────────────────────

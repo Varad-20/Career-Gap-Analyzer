@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     Sparkles, Target, Shield, TrendingUp, Users, Building2,
-    ArrowRight, CheckCircle, Brain, FileSearch, BarChart3
+    ArrowRight, CheckCircle, Brain, FileSearch, BarChart3, BookOpen, ChevronRight, DollarSign
 } from 'lucide-react';
 
 const features = [
@@ -34,6 +34,9 @@ export default function Landing() {
                         <span className="font-bold text-lg">Career Gap Finder</span>
                     </div>
                     <div className="flex items-center gap-4">
+                        <Link to="/instructor" className="btn-ghost text-sm flex items-center gap-1.5 text-yellow-400 hover:text-yellow-300">
+                            <BookOpen className="w-4 h-4" /> Teach on Platform
+                        </Link>
                         <Link to="/login" className="btn-ghost text-sm">Sign In</Link>
                         <Link to="/register" className="btn-primary text-sm py-2 px-5">Get Started Free</Link>
                     </div>
@@ -167,6 +170,42 @@ export default function Landing() {
                 </div>
             </section>
 
+            {/* Instructor CTA Section */}
+            <section className="py-20 px-6 bg-dark-800/30">
+                <div className="max-w-6xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        className="rounded-3xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-orange-500/5 p-10 flex flex-col md:flex-row items-center justify-between gap-8"
+                    >
+                        <div className="flex items-start gap-6">
+                            <div className="w-16 h-16 rounded-2xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+                                <BookOpen className="w-8 h-8 text-yellow-400" />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-2">Are You an Expert? <span className="text-yellow-400">Teach on Our Platform</span></h2>
+                                <p className="text-white/60 max-w-lg">
+                                    Share your knowledge with thousands of career-seekers. Upload courses, earn revenue, and help people land their dream jobs. Admin-reviewed for quality.
+                                </p>
+                                <div className="flex flex-wrap gap-4 mt-4">
+                                    {[{ icon: DollarSign, text: 'Earn per enrollment' }, { icon: Users, text: 'Reach 12K+ learners' }, { icon: CheckCircle, text: 'Admin quality seal' }].map(({ icon: Icon, text }) => (
+                                        <span key={text} className="flex items-center gap-1.5 text-sm text-white/60">
+                                            <Icon className="w-4 h-4 text-yellow-400" /> {text}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <Link
+                            to="/instructor"
+                            className="flex-shrink-0 flex items-center gap-2 px-8 py-4 rounded-2xl bg-yellow-500 hover:bg-yellow-400 text-dark-900 font-bold transition-colors text-base"
+                        >
+                            Start Teaching <ChevronRight className="w-5 h-5" />
+                        </Link>
+                    </motion.div>
+                </div>
+            </section>
+
             {/* CTA */}
             <section className="py-24 px-6 text-center">
                 <div className="max-w-3xl mx-auto glass-card p-12 relative overflow-hidden">
@@ -185,6 +224,6 @@ export default function Landing() {
             <footer className="py-8 px-6 border-t border-white/5 text-center text-white/30 text-sm">
                 <p>© 2024 Career Gap Job Finder. Built with ❤️ for gap professionals.</p>
             </footer>
-        </div>
+        </div >
     );
 }

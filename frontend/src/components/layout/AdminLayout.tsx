@@ -1,8 +1,8 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Building2, LogOut, BarChart3, AlertTriangle, Briefcase, FileText } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext.tsx';
+import { LayoutDashboard, Users, Building2, LogOut, BarChart3, AlertTriangle, Briefcase, FileText, BookOpen } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import { adminAPI } from '../../services/api.ts';
+import { adminAPI } from '../../services/api';
 
 export default function AdminLayout() {
     const { user, logout } = useAuth();
@@ -22,6 +22,7 @@ export default function AdminLayout() {
         { to: '/admin/students', icon: Users, label: 'Students' },
         { to: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
         { to: '/admin/applications', icon: FileText, label: 'Applications' },
+        { to: '/admin/course-review', icon: BookOpen, label: 'Course Review' },
     ];
 
     return (

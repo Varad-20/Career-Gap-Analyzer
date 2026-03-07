@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, User, FileText, Target, Briefcase, Bookmark,
-    LogOut, Bell, ChevronRight, Sparkles
+    LogOut, Bell, ChevronRight, Sparkles, BookOpen, MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Student } from '../../types';
@@ -13,6 +13,8 @@ const navItems = [
     { to: '/student/matches', icon: Target, label: 'Job Matches' },
     { to: '/student/applications', icon: Briefcase, label: 'Applications' },
     { to: '/student/saved', icon: Bookmark, label: 'Saved Jobs' },
+    { to: '/student/skill-up', icon: BookOpen, label: 'Skill Up' },
+    { to: '/student/queries', icon: MessageSquare, label: 'My Queries' },
 ];
 
 export default function StudentLayout() {
@@ -49,7 +51,12 @@ export default function StudentLayout() {
                             {user?.name?.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-white text-sm font-medium truncate">{user?.name}</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-white text-sm font-medium truncate">{user?.name}</p>
+                                {student?.subscription?.plan === 'premium' && (
+                                    <Sparkles className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                                )}
+                            </div>
                             <p className="text-white/40 text-xs truncate">{user?.email}</p>
                         </div>
                     </div>
@@ -65,6 +72,25 @@ export default function StudentLayout() {
                             <span className="text-sm font-medium">{label}</span>
                         </NavLink>
                     ))}
+
+                    {/* Go Premium CTA */}
+                    {student?.subscription?.plan !== 'premium' && (
+                        <div className="mt-6 mx-2 p-4 rounded-2xl bg-gradient-to-br from-primary-600 to-purple-700 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-xl" />
+                            <div className="relative z-10">
+                                <p className="text-white font-black text-xs uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                                    <Sparkles className="w-3 h-3" /> Pro
+                                </p>
+                                <p className="text-white/80 text-[10px] leading-tight mb-3">Unlock all AI features & premium courses.</p>
+                                <button
+                                    onClick={() => navigate('/student/premium')}
+                                    className="w-full py-2 bg-white text-primary-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-dark-900 hover:text-white transition-all shadow-lg active:scale-95"
+                                >
+                                    Upgrade Now
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </nav>
 
                 {/* Logout */}

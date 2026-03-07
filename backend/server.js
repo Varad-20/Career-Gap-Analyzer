@@ -26,6 +26,8 @@ app.use('/api/student', require('./src/routes/studentRoutes'));
 app.use('/api/company', require('./src/routes/companyRoutes'));
 app.use('/api/admin', require('./src/routes/adminRoutes'));
 app.use('/api/jobs', require('./src/routes/jobRoutes'));
+app.use('/api/skills', require('./src/routes/skillRoutes'));
+app.use('/api', require('./src/routes/instructorRoutes'));
 
 // ─── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {

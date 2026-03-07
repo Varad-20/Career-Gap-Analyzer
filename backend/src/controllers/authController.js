@@ -1,6 +1,7 @@
 const Student = require('../models/Student');
 const Company = require('../models/Company');
 const Admin = require('../models/Admin');
+const Instructor = require('../models/Instructor');
 const { generateToken } = require('../middleware/auth');
 
 // ─── STUDENT AUTH ─────────────────────────────────────────────────────────────
@@ -85,6 +86,50 @@ exports.loginCompany = async (req, res) => {
             success: true,
             token,
             user: { id: company._id, name: company.companyName, email, role: 'company', isApproved: company.isApproved }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─── INSTRUCTOR AUTH ────────────────────────────────────────────────────────────
+
+exports.registerInstructor = async (req, res) => {
+    try {
+        const { name, email, password, specialization } = req.body;
+
+        const existing = await Instructor.findOne({ email });
+        if (existing) {
+            return res.status(400).json({ success: false, message: 'Email already registered' });
+        }
+
+        const instructor = await Instructor.create({ name, email, password, specialization });
+        const token = generateToken(instructor._id);
+
+        res.status(201).json({
+            success: true,
+            token,
+            user: { id: instructor._id, name, email, role: 'instructor' }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.loginInstructor = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const instructor = await Instructor.findOne({ email });
+
+        if (!instructor || !(await instructor.comparePassword(password))) {
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        }
+
+        const token = generateToken(instructor._id);
+        res.json({
+            success: true,
+            token,
+            user: { id: instructor._id, name: instructor.name, email, role: 'instructor' }
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });

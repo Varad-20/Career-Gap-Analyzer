@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const Student = require('../models/Student');
 const Company = require('../models/Company');
 const Admin = require('../models/Admin');
+const Instructor = require('../models/Instructor');
 
 // Protect any route — verifies JWT and attaches user
 const protect = async (req, res, next) => {
@@ -21,6 +22,7 @@ const protect = async (req, res, next) => {
         let user = await Student.findById(decoded.id).select('-password');
         if (!user) user = await Company.findById(decoded.id).select('-password');
         if (!user) user = await Admin.findById(decoded.id).select('-password');
+        if (!user) user = await Instructor.findById(decoded.id).select('-password');
 
         if (!user) {
             return res.status(401).json({ success: false, message: 'Token user not found' });
@@ -37,6 +39,11 @@ const protect = async (req, res, next) => {
 // Role-based access control
 const authorize = (...roles) => {
     return (req, res, next) => {
+        // Admin has super-access to everything
+        if (req.userRole === 'admin') {
+            return next();
+        }
+
         if (!roles.includes(req.userRole)) {
             return res.status(403).json({
                 success: false,
