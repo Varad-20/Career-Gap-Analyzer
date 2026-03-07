@@ -120,6 +120,19 @@ exports.getAllJobs = async (req, res) => {
     }
 };
 
+exports.getAllApplications = async (req, res) => {
+    try {
+        const applications = await Application.find()
+            .populate('student', 'name email skills gapDuration gapRiskLevel')
+            .populate('job', 'jobRole location salaryDisplay')
+            .populate('company', 'companyName')
+            .sort('-createdAt');
+        res.json({ success: true, applications });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 // ─── SEED ADMIN ───────────────────────────────────────────────────────────────
 
 exports.seedAdmin = async (req, res) => {

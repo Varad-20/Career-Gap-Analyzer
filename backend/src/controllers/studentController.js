@@ -124,7 +124,8 @@ exports.getMatchedJobs = async (req, res) => {
                 matchScore: m.matchScore,
                 skillMatchPercentage: m.skillMatchPercentage,
                 gapCompliant: m.gapCompliant,
-                details: m.details
+                details: m.details,
+                isSaved: student.savedJobs.some(id => id.toString() === m.job._id.toString())
             }))
         });
     } catch (err) {
@@ -213,9 +214,9 @@ exports.toggleSaveJob = async (req, res) => {
         const { jobId } = req.params;
         const student = await Student.findById(req.user._id);
 
-        const isSaved = student.savedJobs.includes(jobId);
+        const isSaved = student.savedJobs.some(id => id.toString() === jobId.toString());
         if (isSaved) {
-            student.savedJobs = student.savedJobs.filter(id => id.toString() !== jobId);
+            student.savedJobs = student.savedJobs.filter(id => id.toString() !== jobId.toString());
         } else {
             student.savedJobs.push(jobId);
         }
@@ -231,7 +232,13 @@ exports.toggleSaveJob = async (req, res) => {
 
 exports.getSavedJobs = async (req, res) => {
     try {
-        const student = await Student.findById(req.user._id).populate('savedJobs');
+        const student = await Student.findById(req.user._id).populate({
+            path: 'savedJobs',
+            populate: {
+                path: 'company',
+                select: 'companyName logo location'
+            }
+        });
         res.json({ success: true, savedJobs: student.savedJobs });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });

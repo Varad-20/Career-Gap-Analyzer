@@ -19,11 +19,14 @@ import SavedJobs from './pages/student/SavedJobs.tsx';
 import CompanyDashboard from './pages/company/CompanyDashboard.tsx';
 import PostJob from './pages/company/PostJob.tsx';
 import JobApplications from './pages/company/JobApplications.tsx';
+import CompanyProfile from './pages/company/CompanyProfile.tsx';
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard.tsx';
 import ManageStudents from './pages/admin/ManageStudents.tsx';
 import ManageCompanies from './pages/admin/ManageCompanies.tsx';
+import ManageJobs from './pages/admin/ManageJobs.tsx';
+import ManageApplications from './pages/admin/ManageApplications.tsx';
 
 // Layout
 import StudentLayout from './components/layout/StudentLayout.tsx';
@@ -77,6 +80,7 @@ function AppRoutes() {
             }>
                 <Route index element={<Navigate to="/company/dashboard" replace />} />
                 <Route path="dashboard" element={<CompanyDashboard />} />
+                <Route path="profile" element={<CompanyProfile />} />
                 <Route path="post-job" element={<PostJob />} />
                 <Route path="jobs/:jobId/applications" element={<JobApplications />} />
             </Route>
@@ -89,6 +93,8 @@ function AppRoutes() {
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="students" element={<ManageStudents />} />
                 <Route path="companies" element={<ManageCompanies />} />
+                <Route path="jobs" element={<ManageJobs />} />
+                <Route path="applications" element={<ManageApplications />} />
             </Route>
 
             {/* Fallback */}

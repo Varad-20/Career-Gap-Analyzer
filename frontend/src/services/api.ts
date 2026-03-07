@@ -73,6 +73,7 @@ export const adminAPI = {
     approveCompany: (id: string) => api.put(`/admin/companies/${id}/approve`),
     deleteCompany: (id: string) => api.delete(`/admin/companies/${id}`),
     getAllJobs: () => api.get('/admin/jobs'),
+    getAllApplications: () => api.get('/admin/applications'),
     seedAdmin: () => api.post('/admin/seed'),
 };
 

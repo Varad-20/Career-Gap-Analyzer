@@ -35,7 +35,10 @@ export default function JobMatches() {
 
     const saveMutation = useMutation({
         mutationFn: (jobId: string) => studentAPI.toggleSaveJob(jobId),
-        onSuccess: () => toast.success('Job bookmark toggled!'),
+        onSuccess: (res) => {
+            toast.success(res.data.saved ? 'Job Saved!' : 'Job Unsaved!');
+            refetch();
+        },
     });
 
     const matches: MatchResult[] = data?.matches || [];
@@ -67,10 +70,10 @@ export default function JobMatches() {
                         value={filters.skillMatch}
                         onChange={e => setFilters(f => ({ ...f, skillMatch: parseInt(e.target.value) }))}
                     >
-                        <option value={0}>Any</option>
-                        <option value={30}>30%+</option>
-                        <option value={50}>50%+</option>
-                        <option value={70}>70%+</option>
+                        <option value={0} className="text-gray-900 bg-white">Any</option>
+                        <option value={30} className="text-gray-900 bg-white">30%+</option>
+                        <option value={50} className="text-gray-900 bg-white">50%+</option>
+                        <option value={70} className="text-gray-900 bg-white">70%+</option>
                     </select>
                 </div>
                 <div>
@@ -103,7 +106,7 @@ export default function JobMatches() {
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {matches.map(({ job, matchScore, skillMatchPercentage, gapCompliant }, i) => (
+                    {matches.map(({ job, matchScore, skillMatchPercentage, gapCompliant, isSaved }, i) => (
                         <motion.div
                             key={job._id}
                             initial={{ opacity: 0, y: 20 }}
@@ -119,7 +122,7 @@ export default function JobMatches() {
                                         </div>
                                         <div>
                                             <h3 className="text-white font-semibold">{job.jobRole}</h3>
-                                            <p className="text-white/50 text-sm">{job.companyName}</p>
+                                            <p className="text-white/50 text-sm">{typeof job.company === 'object' ? job.company.companyName : job.companyName}</p>
                                         </div>
                                     </div>
 
@@ -171,9 +174,9 @@ export default function JobMatches() {
                                 </button>
                                 <button
                                     onClick={() => saveMutation.mutate(job._id)}
-                                    className="btn-secondary text-sm py-2 flex items-center gap-2"
+                                    className={`text-sm py-2 flex items-center gap-2 ${isSaved ? 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 rounded-lg px-4 font-semibold transition-all' : 'btn-secondary'}`}
                                 >
-                                    <BookmarkPlus className="w-4 h-4" /> Save
+                                    <BookmarkPlus className="w-4 h-4" /> {isSaved ? 'Saved' : 'Save'}
                                 </button>
                             </div>
 

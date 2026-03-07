@@ -43,11 +43,11 @@ export default function SavedJobs() {
                         >
                             <div className="flex items-start gap-3 mb-3">
                                 <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-400 font-bold flex-shrink-0">
-                                    {job.companyName?.charAt(0)}
+                                    {(typeof job.company === 'object' ? (job.company as any).companyName : job.companyName)?.charAt(0)}
                                 </div>
                                 <div>
                                     <h3 className="text-white font-semibold">{job.jobRole}</h3>
-                                    <p className="text-white/50 text-sm">{job.companyName}</p>
+                                    <p className="text-white/50 text-sm">{typeof job.company === 'object' ? (job.company as any).companyName : job.companyName}</p>
                                 </div>
                                 <Bookmark className="w-4 h-4 text-yellow-400 ml-auto flex-shrink-0" />
                             </div>

@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Building2, LogOut, BarChart3, AlertTriangle } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, LogOut, BarChart3, AlertTriangle, Briefcase, FileText } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { useQuery } from '@tanstack/react-query';
 import { adminAPI } from '../../services/api.ts';
@@ -20,6 +20,8 @@ export default function AdminLayout() {
         { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Analytics' },
         { to: '/admin/companies', icon: Building2, label: 'Companies', badge: pendingCount },
         { to: '/admin/students', icon: Users, label: 'Students' },
+        { to: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
+        { to: '/admin/applications', icon: FileText, label: 'Applications' },
     ];
 
     return (

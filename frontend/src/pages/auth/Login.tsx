@@ -70,8 +70,8 @@ export default function Login() {
                         {(['student', 'company'] as Role[]).map(r => (
                             <button key={r} onClick={() => setRole(r)}
                                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${role === r
-                                        ? 'bg-primary-500 text-white shadow-lg'
-                                        : 'text-white/50 hover:text-white'
+                                    ? 'bg-primary-500 text-white shadow-lg'
+                                    : 'text-white/50 hover:text-white'
                                     }`}
                             >
                                 {r === 'student' ? <User className="w-4 h-4" /> : <Building2 className="w-4 h-4" />}

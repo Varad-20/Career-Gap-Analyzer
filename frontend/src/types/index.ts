@@ -1,7 +1,7 @@
 // Type definitions for the entire application
 
 export interface User {
-    id: string;
+    _id: string;
     name: string;
     email: string;
     role: 'student' | 'company' | 'admin';
@@ -94,6 +94,7 @@ export interface MatchResult {
         gapDurationOk: boolean;
         companyAcceptsGap: boolean;
     };
+    isSaved?: boolean;
 }
 
 export interface Analytics {

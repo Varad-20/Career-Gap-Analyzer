@@ -45,7 +45,7 @@ export default function ManageStudents() {
                         <tbody className="divide-y divide-white/5">
                             {students.map((student, i) => (
                                 <motion.tr
-                                    key={student.id}
+                                    key={student._id}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: i * 0.03 }}
@@ -80,14 +80,14 @@ export default function ManageStudents() {
                                     </td>
                                     <td className="px-4 py-3">
                                         <span className={`text-sm ${student.gapRiskLevel === 'Low' ? 'text-emerald-400' :
-                                                student.gapRiskLevel === 'Medium' ? 'text-yellow-400' : 'text-red-400'
+                                            student.gapRiskLevel === 'Medium' ? 'text-yellow-400' : 'text-red-400'
                                             }`}>
                                             {student.gapDuration}mo ({student.gapRiskLevel || 'N/A'})
                                         </span>
                                     </td>
                                     <td className="px-4 py-3">
                                         <button
-                                            onClick={() => { if (confirm('Delete this student?')) deleteMutation.mutate(student.id); }}
+                                            onClick={() => { if (confirm('Delete this student?')) deleteMutation.mutate(student._id); }}
                                             className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-2 rounded-lg transition-colors"
                                         >
                                             <Trash2 className="w-4 h-4" />

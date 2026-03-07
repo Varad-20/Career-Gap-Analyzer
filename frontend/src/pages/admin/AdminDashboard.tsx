@@ -21,12 +21,12 @@ export default function AdminDashboard() {
     const analytics: Analytics | undefined = data;
 
     const statCards = [
-        { label: 'Total Students', value: analytics?.totalStudents || 0, icon: Users, color: 'text-primary-400', bg: 'bg-primary-500/10' },
-        { label: 'Companies', value: analytics?.totalCompanies || 0, icon: Building2, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-        { label: 'Active Jobs', value: analytics?.totalJobs || 0, icon: Briefcase, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-        { label: 'Applications', value: analytics?.totalApplications || 0, icon: TrendingUp, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-        { label: 'Gap Candidates', value: analytics?.gapCandidates || 0, icon: Star, color: 'text-accent-400', bg: 'bg-accent-600/10' },
-        { label: 'Pending Approval', value: analytics?.pendingCompanies || 0, icon: Building2, color: 'text-orange-400', bg: 'bg-orange-500/10' },
+        { label: 'Total Students', value: analytics?.totalStudents || 0, icon: Users, color: 'text-primary-400', bg: 'bg-primary-500/10', link: '/admin/students' },
+        { label: 'Companies', value: analytics?.totalCompanies || 0, icon: Building2, color: 'text-blue-400', bg: 'bg-blue-500/10', link: '/admin/companies' },
+        { label: 'Active Jobs', value: analytics?.totalJobs || 0, icon: Briefcase, color: 'text-emerald-400', bg: 'bg-emerald-500/10', link: '/admin/jobs' },
+        { label: 'Applications', value: analytics?.totalApplications || 0, icon: TrendingUp, color: 'text-yellow-400', bg: 'bg-yellow-500/10', link: '/admin/applications' },
+        { label: 'Gap Candidates', value: analytics?.gapCandidates || 0, icon: Star, color: 'text-accent-400', bg: 'bg-accent-600/10', link: '/admin/students' },
+        { label: 'Pending Approval', value: analytics?.pendingCompanies || 0, icon: Building2, color: 'text-orange-400', bg: 'bg-orange-500/10', link: '/admin/companies' },
     ];
 
     return (
@@ -40,13 +40,14 @@ export default function AdminDashboard() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {statCards.map(({ label, value, icon: Icon, color, bg }, i) => (
+                {statCards.map(({ label, value, icon: Icon, color, bg, link }, i) => (
                     <motion.div
                         key={label}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="stat-card"
+                        onClick={() => navigate(link)}
+                        className="stat-card cursor-pointer hover:border-white/20 transition-all active:scale-[0.98]"
                     >
                         <div className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-3`}>
                             <Icon className={`w-5 h-5 ${color}`} />
