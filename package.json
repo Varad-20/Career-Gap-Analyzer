@@ -8,5 +8,8 @@
     "start:backend": "cd backend && npm start",
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
     "seed:admin": "curl -X POST http://localhost:5000/api/admin/seed"
+  },
+  "dependencies": {
+    "mongod": "^2.0.0"
   }
 }
