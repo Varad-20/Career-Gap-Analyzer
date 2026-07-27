@@ -123,4 +123,13 @@ export const jobsAPI = {
     getOne: (id: string) => api.get(`/jobs/${id}`),
 };
 
+// ─── AI CAREER AGENT ──────────────────────────────────────────────────────────
+export const agentAPI = {
+    searchJobs: () => api.post('/agent/search-jobs'),
+    getJobResults: () => api.get('/agent/results'),
+    getSkillGap: () => api.post('/agent/skill-gap'),
+    getLearningRoadmap: () => api.get('/agent/roadmap'),
+    getStatus: () => api.get('/agent/status'),
+};
+
 export default api;

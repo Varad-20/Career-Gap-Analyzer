@@ -18,12 +18,10 @@ import SkillUp from './pages/student/SkillUp';
 import CourseDashboard from './pages/student/CourseDashboard';
 import StudentQueries from './pages/student/StudentQueries';
 import PremiumSession from './pages/student/PremiumSession';
+import AgentDashboard from './pages/student/AgentDashboard';
+import SkillGapReport from './pages/student/SkillGapReport';
 
-// Company pages
-import CompanyDashboard from './pages/company/CompanyDashboard';
-import PostJob from './pages/company/PostJob';
-import JobApplications from './pages/company/JobApplications';
-import CompanyProfile from './pages/company/CompanyProfile';
+
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -43,7 +41,6 @@ import InstructorQueries from './pages/instructor/InstructorQueries';
 
 // Layouts
 import StudentLayout from './components/layout/StudentLayout';
-import CompanyLayout from './components/layout/CompanyLayout';
 import AdminLayout from './components/layout/AdminLayout';
 
 // Protected route wrapper
@@ -84,6 +81,8 @@ function AppRoutes() {
                 <Route path="dashboard" element={<StudentDashboard />} />
                 <Route path="profile" element={<StudentProfile />} />
                 <Route path="resume" element={<ResumeUpload />} />
+                <Route path="agent" element={<AgentDashboard />} />
+                <Route path="skill-gap" element={<SkillGapReport />} />
                 <Route path="matches" element={<JobMatches />} />
                 <Route path="applications" element={<MyApplications />} />
                 <Route path="saved" element={<SavedJobs />} />
@@ -92,19 +91,6 @@ function AppRoutes() {
                 <Route path="skill-up/:courseId" element={<CourseDashboard />} />
                 <Route path="queries" element={<StudentQueries />} />
                 <Route path="premium" element={<PremiumSession />} />
-            </Route>
-
-            {/* Company Portal (Protected) */}
-            <Route path="/company" element={
-                <ProtectedRoute role="company">
-                    <CompanyLayout />
-                </ProtectedRoute>
-            }>
-                <Route index element={<Navigate to="/company/dashboard" replace />} />
-                <Route path="dashboard" element={<CompanyDashboard />} />
-                <Route path="profile" element={<CompanyProfile />} />
-                <Route path="post-job" element={<PostJob />} />
-                <Route path="jobs/:jobId/applications" element={<JobApplications />} />
             </Route>
 
             {/* Instructor Portal — Public, separate auth */}

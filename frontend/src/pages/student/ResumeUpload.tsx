@@ -4,13 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Upload, FileText, Sparkles, CheckCircle, AlertTriangle,
     TrendingUp, Brain, RefreshCw, X, Star, Lightbulb,
-    Building2, MapPin, ArrowRight, Briefcase, Globe, BadgeCheck
+    Building2, MapPin, ArrowRight, Briefcase, Globe, BadgeCheck, Bot
 } from 'lucide-react';
 import { studentAPI } from '../../services/api.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { Student } from '../../types';
 
 interface AnalysisResult {
     skills: string[];
@@ -47,10 +48,26 @@ interface JobMatch {
 
 export default function ResumeUpload() {
     const { updateUser, user } = useAuth();
+    const student = user as Student;
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
-    const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+    const [analysis, setAnalysis] = useState<AnalysisResult | null>(() => {
+        if (student?.resumeScore) {
+            return {
+                skills: student.skills || [],
+                gapDuration: student.gapDuration || 0,
+                gapRiskLevel: student.gapRiskLevel || 'Low',
+                resumeScore: student.resumeScore || 0,
+                suggestedRoles: student.suggestedRoles || [],
+                gapJustification: student.gapJustification || '',
+                resumeSuggestions: student.resumeSuggestions || [],
+                aiPowered: true
+            };
+        }
+        return null;
+    });
     const [generatingJustification, setGeneratingJustification] = useState(false);
     const [justification, setJustification] = useState('');
 
@@ -88,6 +105,13 @@ export default function ResumeUpload() {
             const res = await studentAPI.uploadResume(formData);
             setAnalysis(res.data.analysis);
             updateUser({ ...user!, ...(res.data.student) });
+            
+            // Invalidate other caches so agent & skill gap update immediately
+            queryClient.invalidateQueries({ queryKey: ['agent-jobs'] });
+            queryClient.invalidateQueries({ queryKey: ['agent-status'] });
+            queryClient.invalidateQueries({ queryKey: ['skill-gap'] });
+            queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
+            
             toast.success('Resume analyzed successfully! 🎉');
             // Trigger job match fetch
             setTimeout(() => refetchMatches(), 500);
@@ -127,7 +151,7 @@ export default function ResumeUpload() {
             {/* Upload Zone */}
             <div className="glass-card p-6">
                 <h2 className="text-white font-semibold mb-4 flex items-center gap-2">
-                    <Upload className="w-5 h-5 text-primary-400" /> Upload Resume
+                    <Upload className="w-5 h-5 text-primary-400" /> {analysis ? 'Upload a new Resume' : 'Upload Resume'}
                 </h2>
 
                 <div
@@ -284,143 +308,17 @@ export default function ResumeUpload() {
                             </div>
                         </div>
 
-                        {/* ── GAP-FRIENDLY COMPANIES PORTAL ─────────────────── */}
+                        {/* Launch AI Agent Quick CTA */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                            className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h2 className="text-white font-bold text-lg flex items-center gap-2">
-                                        <Building2 className="w-5 h-5 text-blue-400" />
-                                        Gap-Friendly Companies For You
-                                    </h2>
-                                    <p className="text-white/40 text-sm mt-0.5">
-                                        {matches.length > 0
-                                            ? `${matches.length} companies accepting candidates with career gaps`
-                                            : 'Companies that actively welcome career returners'}
-                                    </p>
-                                </div>
-                                <button onClick={() => navigate('/student/matches')}
-                                    className="flex items-center gap-2 text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors">
-                                    View All Matches <ArrowRight className="w-4 h-4" />
-                                </button>
-                            </div>
-
-                            {matches.length > 0 ? (
-                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {matches.slice(0, 6).map((m, i) => (
-                                        <motion.div key={m.job._id}
-                                            initial={{ opacity: 0, scale: 0.95 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: i * 0.07 }}
-                                            className="glass-card p-4 border border-white/5 hover:border-primary-500/30 transition-all group cursor-pointer"
-                                            onClick={() => navigate('/student/matches')}>
-                                            {/* Company + Match Score */}
-                                            <div className="flex items-start justify-between mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500/30 to-violet-500/30 border border-white/10 flex items-center justify-center text-white font-bold text-sm">
-                                                        {m.job.company?.companyName?.charAt(0) || '?'}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-white font-semibold text-sm leading-tight">{m.job.company?.companyName}</p>
-                                                        <p className="text-white/40 text-xs">{m.job.company?.industry || 'Technology'}</p>
-                                                    </div>
-                                                </div>
-                                                <div className={`text-xs font-bold px-2 py-1 rounded-lg ${m.matchScore >= 70 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                                                    {m.matchScore}%
-                                                </div>
-                                            </div>
-
-                                            {/* Job Role */}
-                                            <p className="text-white/80 font-medium text-sm mb-2">{m.job.jobRole}</p>
-
-                                            {/* Info Pills */}
-                                            <div className="flex flex-wrap gap-1 mb-3">
-                                                {m.job.location && (
-                                                    <span className="flex items-center gap-1 text-xs text-white/40 bg-white/5 px-2 py-1 rounded-lg">
-                                                        <MapPin className="w-3 h-3" /> {m.job.location}
-                                                    </span>
-                                                )}
-                                                <span className="flex items-center gap-1 text-xs text-white/40 bg-white/5 px-2 py-1 rounded-lg">
-                                                    <Briefcase className="w-3 h-3" /> {m.job.jobType}
-                                                </span>
-                                            </div>
-
-                                            {/* Gap Accepted Badge */}
-                                            <div className="flex items-center justify-between">
-                                                <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg">
-                                                    <BadgeCheck className="w-3 h-3" /> Gap accepted up to {m.job.maxGapAllowed}mo
-                                                </span>
-                                                <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            ) : (
-                                /* Static fallback cards when no DB data yet */
-                                <div className="grid md:grid-cols-3 gap-4">
-                                    {[
-                                        { name: 'TechVision Solutions', role: 'Frontend Developer', location: 'Remote', gap: 24, score: 85, type: 'Full-time', color: 'from-blue-500/30 to-indigo-500/30' },
-                                        { name: 'OpenSource Innovators', role: 'Backend Developer', location: 'New York, NY', gap: 36, score: 78, type: 'Full-time', color: 'from-violet-500/30 to-purple-500/30' },
-                                        { name: 'Apex Data Labs', role: 'Data Scientist', location: 'San Francisco', gap: 24, score: 72, type: 'Full-time', color: 'from-emerald-500/30 to-teal-500/30' },
-                                    ].map((c, i) => (
-                                        <motion.div key={c.name}
-                                            initial={{ opacity: 0, scale: 0.95 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: i * 0.1 }}
-                                            onClick={() => navigate('/student/matches')}
-                                            className="glass-card p-4 border border-white/5 hover:border-primary-500/30 transition-all group cursor-pointer">
-                                            <div className="flex items-start justify-between mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${c.color} border border-white/10 flex items-center justify-center text-white font-bold text-sm`}>
-                                                        {c.name.charAt(0)}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-white font-semibold text-sm">{c.name}</p>
-                                                        <p className="text-white/40 text-xs">Technology</p>
-                                                    </div>
-                                                </div>
-                                                <span className="text-xs font-bold px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400">{c.score}%</span>
-                                            </div>
-                                            <p className="text-white/80 font-medium text-sm mb-2">{c.role}</p>
-                                            <div className="flex flex-wrap gap-1 mb-3">
-                                                <span className="flex items-center gap-1 text-xs text-white/40 bg-white/5 px-2 py-1 rounded-lg">
-                                                    <MapPin className="w-3 h-3" /> {c.location}
-                                                </span>
-                                                <span className="flex items-center gap-1 text-xs text-white/40 bg-white/5 px-2 py-1 rounded-lg">
-                                                    <Briefcase className="w-3 h-3" /> {c.type}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg">
-                                                    <BadgeCheck className="w-3 h-3" /> Gap OK up to {c.gap}mo
-                                                </span>
-                                                <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Quick Action Buttons */}
-                            <div className="grid md:grid-cols-3 gap-4 pt-2">
-                                {[
-                                    { icon: '🎯', title: 'View Matched Jobs', sub: `${matches.length} available matches`, path: '/student/matches', color: 'from-primary-500/20 to-violet-500/20 border-primary-500/20' },
-                                    { icon: '📄', title: 'Improve Resume', sub: 'Get AI suggestions', path: '/student/resume', color: 'from-emerald-500/20 to-teal-500/20 border-emerald-500/20' },
-                                    { icon: '👤', title: 'Complete Profile', sub: 'Higher match rates', path: '/student/profile', color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/20' },
-                                ].map(({ icon, title, sub, path, color }) => (
-                                    <button key={title} onClick={() => navigate(path)}
-                                        className={`flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r ${color} border hover:scale-[1.02] transition-all group text-left`}>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-2xl">{icon}</span>
-                                            <div>
-                                                <p className="text-white font-semibold text-sm">{title}</p>
-                                                <p className="text-white/50 text-xs">{sub}</p>
-                                            </div>
-                                        </div>
-                                        <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all" />
-                                    </button>
-                                ))}
-                            </div>
+                            className="flex flex-col items-center justify-center p-8 glass-card border border-primary-500/20 bg-gradient-to-r from-primary-500/10 to-violet-500/10 text-center rounded-2xl">
+                            <Bot className="w-12 h-12 text-primary-400 mb-3" />
+                            <h3 className="text-white font-bold text-lg">Your Resume Analysis is Ready!</h3>
+                            <p className="text-white/50 text-sm max-w-md mt-1 mb-5">
+                                Now let our AI Career Agent search live, gap-friendly jobs on the internet tailored specifically to your skills and suggestions.
+                            </p>
+                            <button onClick={() => navigate('/student/agent')} className="btn-primary flex items-center gap-2 py-3 px-8">
+                                <Sparkles className="w-4 h-4" /> Launch AI Career Agent <ArrowRight className="w-4 h-4" />
+                            </button>
                         </motion.div>
                     </motion.div>
                 )}

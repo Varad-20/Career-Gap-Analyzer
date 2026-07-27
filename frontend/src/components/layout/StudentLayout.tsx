@@ -1,20 +1,19 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, User, FileText, Target, Briefcase, Bookmark,
-    LogOut, Bell, ChevronRight, Sparkles, BookOpen, MessageSquare
+    LogOut, Bell, ChevronRight, Sparkles, BookOpen, MessageSquare, Bot
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Student } from '../../types';
 
 const navItems = [
-    { to: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/student/profile', icon: User, label: 'My Profile' },
-    { to: '/student/resume', icon: FileText, label: 'Resume & AI' },
-    { to: '/student/matches', icon: Target, label: 'Job Matches' },
-    { to: '/student/applications', icon: Briefcase, label: 'Applications' },
-    { to: '/student/saved', icon: Bookmark, label: 'Saved Jobs' },
-    { to: '/student/skill-up', icon: BookOpen, label: 'Skill Up' },
-    { to: '/student/queries', icon: MessageSquare, label: 'My Queries' },
+    { to: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard', highlight: false },
+    { to: '/student/profile', icon: User, label: 'My Profile', highlight: false },
+    { to: '/student/resume', icon: FileText, label: 'Resume & AI', highlight: false },
+    { to: '/student/agent', icon: Bot, label: 'AI Career Agent', highlight: true },
+    { to: '/student/skill-gap', icon: Target, label: 'Skill Gap Report', highlight: false },
+    { to: '/student/skill-up', icon: BookOpen, label: 'Skill Up', highlight: false },
+    { to: '/student/queries', icon: MessageSquare, label: 'My Queries', highlight: false },
 ];
 
 export default function StudentLayout() {
@@ -63,13 +62,29 @@ export default function StudentLayout() {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 p-4 space-y-1">
-                    {navItems.map(({ to, icon: Icon, label }) => (
+                <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                    {navItems.map(({ to, icon: Icon, label, highlight }) => (
                         <NavLink key={to} to={to}
-                            className={({ isActive }) => isActive ? 'sidebar-item-active' : 'sidebar-item'}
+                            className={({ isActive }) =>
+                                isActive
+                                    ? 'sidebar-item-active'
+                                    : highlight
+                                        ? 'sidebar-item relative bg-gradient-to-r from-primary-500/10 to-violet-500/10 border border-primary-500/20 hover:border-primary-500/40'
+                                        : 'sidebar-item'
+                            }
                         >
-                            <Icon className="w-5 h-5 flex-shrink-0" />
+                            {highlight ? (
+                                <div className="w-5 h-5 flex-shrink-0 relative">
+                                    <Icon className="w-5 h-5" />
+                                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary-400 rounded-full animate-pulse" />
+                                </div>
+                            ) : (
+                                <Icon className="w-5 h-5 flex-shrink-0" />
+                            )}
                             <span className="text-sm font-medium">{label}</span>
+                            {highlight && (
+                                <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded-full bg-primary-500/30 text-primary-300 font-bold uppercase tracking-wider">AI</span>
+                            )}
                         </NavLink>
                     ))}
 

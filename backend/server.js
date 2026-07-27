@@ -23,11 +23,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ─── API ROUTES ───────────────────────────────────────────────────────────────
 app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/student', require('./src/routes/studentRoutes'));
-app.use('/api/company', require('./src/routes/companyRoutes'));
 app.use('/api/admin', require('./src/routes/adminRoutes'));
-app.use('/api/jobs', require('./src/routes/jobRoutes'));
 app.use('/api/skills', require('./src/routes/skillRoutes'));
 app.use('/api', require('./src/routes/instructorRoutes'));
+app.use('/api/agent', require('./src/routes/agentRoutes'));
 
 // ─── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {

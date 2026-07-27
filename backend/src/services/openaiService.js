@@ -79,7 +79,7 @@ Rules:
     }).map(s => s.charAt(0).toUpperCase() + s.slice(1));
 
     // Basic heuristic for gap duration (randomized for fallback if no clear dates exist)
-    const gapDuration = textLower.includes('gap') || textLower.includes('break') ? 6 : 0;
+    const gapDuration = (textLower.includes('career gap') || textLower.includes('employment gap') || textLower.includes('career break')) ? 6 : 0;
     const gapRiskLevel = gapDuration > 12 ? 'High' : gapDuration > 6 ? 'Medium' : 'Low';
 
     // Resume Score based on text length and skills found

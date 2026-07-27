@@ -25,6 +25,7 @@ export default function StudentProfile() {
         bio: '',
         graduationYear: '',
         skills: [] as string[],
+        suggestedRoles: [] as string[],
     });
 
     // Sync form with fetched data
@@ -37,6 +38,7 @@ export default function StudentProfile() {
             bio: data.bio || '',
             graduationYear: data.graduationYear?.toString() || '',
             skills: data.skills || [],
+            suggestedRoles: data.suggestedRoles || [],
         });
     }
 
@@ -49,6 +51,17 @@ export default function StudentProfile() {
 
     const removeSkill = (skill: string) => {
         setForm(f => ({ ...f, skills: f.skills.filter(s => s !== skill) }));
+    };
+
+    const [newRole, setNewRole] = useState('');
+    const addRole = () => {
+        if (newRole.trim() && !form.suggestedRoles.includes(newRole.trim())) {
+            setForm(f => ({ ...f, suggestedRoles: [...f.suggestedRoles, newRole.trim()] }));
+            setNewRole('');
+        }
+    };
+    const removeRole = (role: string) => {
+        setForm(f => ({ ...f, suggestedRoles: f.suggestedRoles.filter(r => r !== role) }));
     };
 
     const handleSave = async () => {
@@ -168,6 +181,40 @@ export default function StudentProfile() {
                         onKeyDown={e => e.key === 'Enter' && addSkill()}
                     />
                     <button onClick={addSkill} className="btn-secondary px-4">
+                        <Plus className="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Target Job Roles */}
+            <div className="glass-card p-6">
+                <h2 className="text-white font-semibold mb-4">Target Job Roles</h2>
+                <p className="text-white/40 text-sm mb-4">The AI Career Agent uses these roles to search for jobs.</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                    {form.suggestedRoles.map(role => (
+                        <motion.span
+                            key={role}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="badge flex items-center gap-1.5 bg-violet-500/20 text-violet-300 border border-violet-500/30"
+                        >
+                            {role}
+                            <button onClick={() => removeRole(role)} className="text-violet-400 hover:text-red-400 ml-1">
+                                <X className="w-3 h-3" />
+                            </button>
+                        </motion.span>
+                    ))}
+                </div>
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        className="input-field"
+                        placeholder="Add a target role (e.g. Frontend Developer...)"
+                        value={newRole}
+                        onChange={e => setNewRole(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && addRole()}
+                    />
+                    <button onClick={addRole} className="btn-secondary px-4">
                         <Plus className="w-5 h-5" />
                     </button>
                 </div>

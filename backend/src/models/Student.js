@@ -20,6 +20,18 @@ const studentSchema = new mongoose.Schema({
     resumeURL: { type: String, default: '' },
     extractedResumeText: { type: String, default: '' },
 
+    // Enriched resume data
+    certifications: [{ name: String, issuer: String, year: Number }],
+    projects: [{ title: String, description: String, techStack: [String] }],
+    workExperience: [{
+        role: String,
+        company: String,
+        startDate: String,
+        endDate: String,
+        isCurrent: Boolean
+    }],
+    totalExperience: { type: Number, default: 0 },
+
     // AI Generated
     resumeScore: { type: Number, default: 0 },
     gapRiskLevel: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Low' },
@@ -42,6 +54,32 @@ const studentSchema = new mongoose.Schema({
     },
     isProfileComplete: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
+
+    // AI Career Agent — cached live job results
+    liveJobResults: [{
+        id: String,
+        title: String,
+        company: String,
+        location: String,
+        isRemote: Boolean,
+        workType: String,
+        description: String,
+        applyLink: String,
+        source: String,
+        sourcePlatform: String,
+        postedAt: String,
+        requiredSkills: [String],
+        experienceLevel: String,
+        salaryMin: Number,
+        salaryMax: Number,
+        salaryDisplay: String,
+        salaryCurrency: String,
+        logo: String,
+        gapFriendly: Boolean,
+        matchScore: Number,
+        matchedSkills: [String],
+    }],
+    lastJobSearchAt: { type: Date },
     notifications: [{
         message: String,
         read: { type: Boolean, default: false },

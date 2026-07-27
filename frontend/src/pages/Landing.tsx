@@ -46,8 +46,8 @@ export default function Landing() {
             {/* Hero Section */}
             <section className="pt-32 pb-20 px-6 relative overflow-hidden">
                 {/* Background orbs */}
-                <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl" />
-                <div className="absolute top-40 right-1/4 w-80 h-80 bg-accent-600/20 rounded-full blur-3xl" />
+                <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-40 right-1/4 w-80 h-80 bg-accent-600/20 rounded-full blur-3xl pointer-events-none" />
 
                 <div className="max-w-5xl mx-auto text-center relative">
                     <motion.div
@@ -74,10 +74,6 @@ export default function Landing() {
                             <Link to="/register" className="btn-primary inline-flex items-center gap-2 text-base px-8 py-4">
                                 Start Your Job Search
                                 <ArrowRight className="w-5 h-5" />
-                            </Link>
-                            <Link to="/register?type=company" className="btn-secondary inline-flex items-center gap-2 text-base px-8 py-4">
-                                <Building2 className="w-5 h-5" />
-                                I'm an Employer
                             </Link>
                         </div>
                     </motion.div>
@@ -209,14 +205,16 @@ export default function Landing() {
             {/* CTA */}
             <section className="py-24 px-6 text-center">
                 <div className="max-w-3xl mx-auto glass-card p-12 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-button-gradient opacity-5" />
-                    <Sparkles className="w-12 h-12 text-primary-400 mx-auto mb-6" />
-                    <h2 className="text-4xl font-bold mb-4">Ready to Find Your Job?</h2>
-                    <p className="text-white/60 mb-8">Join thousands of gap candidates who found their dream jobs through our platform.</p>
-                    <Link to="/register" className="btn-primary inline-flex items-center gap-2 text-base px-10 py-4">
-                        Create Free Account
-                        <ArrowRight className="w-5 h-5" />
-                    </Link>
+                    <div className="absolute inset-0 bg-button-gradient opacity-5 pointer-events-none" />
+                    <div className="relative z-10">
+                        <Sparkles className="w-12 h-12 text-primary-400 mx-auto mb-6" />
+                        <h2 className="text-4xl font-bold mb-4">Ready to Find Your Job?</h2>
+                        <p className="text-white/60 mb-8">Join thousands of gap candidates who found their dream jobs through our platform.</p>
+                        <Link to="/register" className="btn-primary inline-flex items-center gap-2 text-base px-10 py-4">
+                            Create Free Account
+                            <ArrowRight className="w-5 h-5" />
+                        </Link>
+                    </div>
                 </div>
             </section>
 

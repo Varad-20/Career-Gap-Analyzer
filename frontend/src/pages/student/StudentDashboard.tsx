@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
     FileText, Target, Briefcase, TrendingUp, AlertTriangle,
-    CheckCircle, Clock, Star, Upload, ArrowRight, Sparkles
+    CheckCircle, Clock, Star, Upload, ArrowRight, Sparkles, Bot
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { studentAPI } from '../../services/api';
+import { studentAPI, agentAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Student } from '../../types';
 
@@ -30,18 +30,19 @@ export default function StudentDashboard() {
         queryFn: () => studentAPI.getDashboard().then(r => r.data.stats),
     });
 
-    const { data: matchesData } = useQuery({
-        queryKey: ['studentMatches'],
-        queryFn: () => studentAPI.getMatches().then(r => r.data),
+    const { data: jobData } = useQuery({
+        queryKey: ['agent-jobs'],
+        queryFn: () => agentAPI.getJobResults().then(r => r.data),
+        enabled: !!student.resumeURL,
     });
 
     const stats = statsData || {};
-    const matchCount = matchesData?.count || 0;
+    const aiJobsCount = jobData?.jobs?.length || 0;
 
     const statCards = [
         { label: 'Resume Score', value: `${stats.resumeScore || 0}%`, icon: FileText, color: 'text-primary-400', bg: 'bg-primary-500/10' },
-        { label: 'Job Matches', value: matchCount, icon: Target, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-        { label: 'Applications', value: stats.totalApplications || 0, icon: Briefcase, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+        { label: 'AI Jobs Found', value: student.resumeURL ? `${aiJobsCount}` : '0', icon: Target, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+        { label: 'Skills Found', value: stats.skillsCount || 0, icon: Star, color: 'text-blue-400', bg: 'bg-blue-500/10' },
         { label: 'Gap Duration', value: `${stats.gapDuration || 0} mo`, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
     ];
 
@@ -91,13 +92,13 @@ export default function StudentDashboard() {
                 ))}
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="space-y-6">
                 {/* Resume Analysis Card */}
                 <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="glass-card p-6 lg:col-span-2"
+                    className="glass-card p-6"
                 >
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-white font-semibold flex items-center gap-2">
@@ -144,48 +145,12 @@ export default function StudentDashboard() {
                         </div>
                     )}
                 </motion.div>
-
-                {/* Application Status */}
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="glass-card p-6"
-                >
-                    <h2 className="text-white font-semibold mb-6 flex items-center gap-2">
-                        <Briefcase className="w-5 h-5 text-blue-400" />
-                        Applications
-                    </h2>
-
-                    <div className="space-y-3">
-                        {[
-                            { label: 'Pending', count: stats.pendingApplications || 0, color: 'text-yellow-400', bg: 'bg-yellow-500/10', icon: Clock },
-                            { label: 'Shortlisted', count: stats.shortlisted || 0, color: 'text-blue-400', bg: 'bg-blue-500/10', icon: Star },
-                            { label: 'Accepted', count: stats.accepted || 0, color: 'text-emerald-400', bg: 'bg-emerald-500/10', icon: CheckCircle },
-                            { label: 'Rejected', count: stats.rejected || 0, color: 'text-red-400', bg: 'bg-red-500/10', icon: AlertTriangle },
-                        ].map(({ label, count, color, bg, icon: Icon }) => (
-                            <div key={label} className={`flex items-center justify-between p-3 ${bg} rounded-xl`}>
-                                <div className="flex items-center gap-2">
-                                    <Icon className={`w-4 h-4 ${color}`} />
-                                    <span className="text-white/70 text-sm">{label}</span>
-                                </div>
-                                <span className={`font-bold ${color}`}>{count}</span>
-                            </div>
-                        ))}
-                    </div>
-
-                    <Link to="/student/applications"
-                        className="mt-4 btn-ghost text-sm w-full flex items-center justify-center gap-2"
-                    >
-                        View All <ArrowRight className="w-4 h-4" />
-                    </Link>
-                </motion.div>
             </div>
 
             {/* Quick Actions */}
             <div className="grid md:grid-cols-3 gap-4">
                 {[
-                    { to: '/student/matches', label: 'View Matched Jobs', icon: Target, desc: `${matchCount} available matches`, color: 'from-primary-500 to-accent-600' },
+                    { to: student.resumeURL ? '/student/agent' : '/student/resume', label: 'Launch AI Agent', icon: Bot, desc: student.resumeURL ? `${aiJobsCount} live jobs found` : 'Upload resume first', color: 'from-primary-500 to-accent-600' },
                     { to: '/student/resume', label: 'Improve Resume', icon: TrendingUp, desc: 'Get AI suggestions', color: 'from-emerald-600 to-teal-600' },
                     { to: '/student/profile', label: 'Complete Profile', icon: CheckCircle, desc: 'Higher match rates', color: 'from-blue-600 to-indigo-600' },
                 ].map(({ to, label, icon: Icon, desc, color }) => (

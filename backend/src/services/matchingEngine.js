@@ -10,8 +10,8 @@
  * @returns {number} Match percentage 0-100
  */
 const calculateSkillMatch = (studentSkills, requiredSkills) => {
-    if (!requiredSkills.length) return 100;
-    if (!studentSkills.length) return 0;
+    if (!requiredSkills || !requiredSkills.length) return 100;
+    if (!studentSkills || !studentSkills.length) return 0;
 
     const normalize = (arr) => arr.map(s => s.toLowerCase().trim());
     const sSet = new Set(normalize(studentSkills));
@@ -48,7 +48,8 @@ const calculateSkillMatch = (studentSkills, requiredSkills) => {
  */
 const calculateMatchScore = (student, job) => {
     const skillMatch = calculateSkillMatch(student.skills, job.requiredSkills);
-    const gapCompliant = job.acceptGap && (student.gapDuration <= job.maxGapAllowed);
+    const studentGap = student.gapDuration || 0;
+    const gapCompliant = job.acceptGap && (studentGap <= job.maxGapAllowed);
 
     // Weighted scoring:
     // - Skill match: 60%
@@ -58,7 +59,7 @@ const calculateMatchScore = (student, job) => {
     const gapScore = gapCompliant ? 30 : 0;
     const matchScore = Math.round(skillMatch * 0.6 + gapScore + resumeBonus);
 
-    const isMatch = gapCompliant && skillMatch >= 30; // minimum 30% skill match
+    const isMatch = gapCompliant;
 
     return {
         isMatch,

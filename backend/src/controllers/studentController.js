@@ -5,6 +5,7 @@ const Application = require('../models/Application');
 const { analyzeResume, generateGapJustification, getResumeSuggestions } = require('../services/openaiService');
 const { getMatchedJobs } = require('../services/matchingEngine');
 const { extractTextFromPDF } = require('../utils/fileUtils');
+const { runJobSearchAgent } = require('../services/jobSearchAgent');
 
 // ─── GET PROFILE ──────────────────────────────────────────────────────────────
 
@@ -21,17 +22,42 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { name, degree, skills, graduationYear, location, phone, bio } = req.body;
+        const { name, degree, skills, suggestedRoles, graduationYear, location, phone, bio } = req.body;
 
         const skillsArray = typeof skills === 'string'
             ? skills.split(',').map(s => s.trim()).filter(Boolean)
             : skills;
+            
+        const rolesArray = typeof suggestedRoles === 'string'
+            ? suggestedRoles.split(',').map(s => s.trim()).filter(Boolean)
+            : suggestedRoles;
 
         const updated = await Student.findByIdAndUpdate(
             req.user._id,
-            { name, degree, skills: skillsArray, graduationYear, location, phone, bio, isProfileComplete: true },
+            { name, degree, skills: skillsArray, suggestedRoles: rolesArray, graduationYear, location, phone, bio, isProfileComplete: true },
             { new: true, runValidators: true }
         ).select('-password');
+        
+        // 🤖 Trigger AI Job Search Agent in background to refresh jobs based on new skills/roles
+        setImmediate(async () => {
+            try {
+                const studentProfile = {
+                    skills: updated.skills || [],
+                    suggestedRoles: updated.suggestedRoles || [],
+                    location: updated.location || 'India',
+                    gapDuration: updated.gapDuration || 0,
+                    degree: updated.graduationYear || '',
+                };
+                const liveJobs = await runJobSearchAgent(studentProfile);
+                await Student.findByIdAndUpdate(req.user._id, {
+                    liveJobResults: liveJobs.slice(0, 20),
+                    lastJobSearchAt: new Date(),
+                });
+                console.log(`✅ AI Agent: Job search refreshed after profile update for student ${req.user._id}`);
+            } catch (agentErr) {
+                console.error('AI Agent background search error:', agentErr.message);
+            }
+        });
 
         res.json({ success: true, student: updated });
     } catch (err) {
@@ -76,9 +102,30 @@ exports.uploadResume = async (req, res) => {
 
         const student = await Student.findByIdAndUpdate(req.user._id, updateData, { new: true }).select('-password');
 
+        // 🤖 Trigger AI Job Search Agent in background (non-blocking)
+        setImmediate(async () => {
+            try {
+                const studentProfile = {
+                    skills: data.skills || [],
+                    suggestedRoles: data.suggestedRoles || [],
+                    location: student.location || 'India',
+                    gapDuration: data.gapDuration || 0,
+                    degree: data.graduationYear || '',
+                };
+                const liveJobs = await runJobSearchAgent(studentProfile);
+                await Student.findByIdAndUpdate(req.user._id, {
+                    liveJobResults: liveJobs.slice(0, 20),
+                    lastJobSearchAt: new Date(),
+                });
+                console.log(`✅ AI Agent: Job search completed for student ${req.user._id} — ${liveJobs.length} jobs found`);
+            } catch (agentErr) {
+                console.error('AI Agent background search error:', agentErr.message);
+            }
+        });
+
         res.json({
             success: true,
-            message: 'Resume uploaded and analyzed successfully',
+            message: 'Resume uploaded and analyzed successfully. AI Agent is searching jobs in the background.',
             student,
             analysis: {
                 skills: data.skills,
@@ -88,7 +135,8 @@ exports.uploadResume = async (req, res) => {
                 suggestedRoles: data.suggestedRoles,
                 gapJustification: data.gapJustification,
                 resumeSuggestions: data.resumeSuggestions,
-                aiPowered: aiSuccess
+                aiPowered: aiSuccess,
+                totalExperience: data.totalExperience || 0,
             }
         });
     } catch (err) {
@@ -102,11 +150,13 @@ exports.getMatchedJobs = async (req, res) => {
     try {
         const student = await Student.findById(req.user._id);
 
+
+
         const { gapMin, gapMax, skillMatch, location, salaryMin } = req.query;
 
         let query = { isActive: true, acceptGap: true };
         if (location) query.location = { $regex: location, $options: 'i' };
-        if (gapMax) query.maxGapAllowed = { $gte: student.gapDuration };
+        if (gapMax) query.maxGapAllowed = { $gte: (student.gapDuration || 0) };
 
         const jobs = await Job.find(query).populate('company', 'companyName logo location');
         const matches = getMatchedJobs(student, jobs);

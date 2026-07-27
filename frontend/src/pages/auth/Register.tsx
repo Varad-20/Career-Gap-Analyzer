@@ -9,13 +9,11 @@ import toast from 'react-hot-toast';
 type Role = 'student' | 'company';
 
 export default function Register() {
-    const [searchParams] = useSearchParams();
-    const [role, setRole] = useState<Role>((searchParams.get('type') as Role) || 'student');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [form, setForm] = useState({
-        name: '', companyName: '', email: '', password: '',
-        degree: '', graduationYear: '', industry: '', location: ''
+        name: '', email: '', password: '',
+        degree: '', graduationYear: ''
     });
 
     const { login } = useAuth();
@@ -25,31 +23,18 @@ export default function Register() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            let res;
-            if (role === 'student') {
-                res = await authAPI.studentRegister({
-                    name: form.name,
-                    email: form.email,
-                    password: form.password,
-                    degree: form.degree,
-                    graduationYear: form.graduationYear ? parseInt(form.graduationYear) : undefined,
-                });
-            } else {
-                res = await authAPI.companyRegister({
-                    companyName: form.companyName,
-                    email: form.email,
-                    password: form.password,
-                    industry: form.industry,
-                    location: form.location,
-                });
-            }
+            const res = await authAPI.studentRegister({
+                name: form.name,
+                email: form.email,
+                password: form.password,
+                degree: form.degree,
+                graduationYear: form.graduationYear ? parseInt(form.graduationYear) : undefined,
+            });
 
             const { token, user } = res.data;
             login(token, user);
             toast.success('Account created successfully! 🎉');
-
-            if (user.role === 'student') navigate('/student/dashboard');
-            else navigate('/company/dashboard');
+            navigate('/student/dashboard');
         } catch (err: any) {
             toast.error(err.response?.data?.message || 'Registration failed');
         } finally {
@@ -57,9 +42,7 @@ export default function Register() {
         }
     };
 
-    const benefits = role === 'student'
-        ? ['AI Resume Analysis', 'Matched job listings', 'Gap justification letter', 'Application tracking']
-        : ['Post unlimited jobs', 'Access gap-candidate pool', 'AI-scored applicants', 'Free approval process'];
+    const benefits = ['AI Resume Analysis', 'Matched job listings', 'Gap justification letter', 'Application tracking'];
 
     return (
         <div className="min-h-screen bg-hero-gradient flex items-center justify-center p-6">
@@ -81,12 +64,10 @@ export default function Register() {
                     </Link>
 
                     <h2 className="text-4xl font-bold text-white mb-4">
-                        {role === 'student' ? 'Find Jobs That Welcome You' : 'Hire Gap-Resilient Talent'}
+                        Find Jobs That Welcome You
                     </h2>
                     <p className="text-white/50 mb-8 text-lg">
-                        {role === 'student'
-                            ? 'Stop being rejected. Connect with companies that actively seek candidates like you.'
-                            : 'Access a curated pool of motivated gap candidates who are ready to prove themselves.'}
+                        Stop being rejected. Connect with companies that actively seek candidates like you.
                     </p>
 
                     <div className="space-y-3">
@@ -117,61 +98,24 @@ export default function Register() {
                     <div className="glass-card p-8">
                         <h3 className="text-xl font-bold text-white mb-6">Create Your Account</h3>
 
-                        {/* Role tabs */}
-                        <div className="flex gap-2 mb-6 p-1 bg-white/5 rounded-xl">
-                            {(['student', 'company'] as Role[]).map(r => (
-                                <button key={r} onClick={() => setRole(r)}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${role === r ? 'bg-primary-500 text-white' : 'text-white/50 hover:text-white'
-                                        }`}
-                                >
-                                    {r === 'student' ? <User className="w-4 h-4" /> : <Building2 className="w-4 h-4" />}
-                                    {r === 'student' ? 'Student' : 'Employer'}
-                                </button>
-                            ))}
-                        </div>
-
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            {role === 'student' ? (
-                                <>
-                                    <div>
-                                        <label className="label">Full Name</label>
-                                        <input id="reg-name" type="text" className="input-field" placeholder="John Doe"
-                                            value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="label">Degree</label>
-                                            <input type="text" className="input-field" placeholder="B.Tech CS"
-                                                value={form.degree} onChange={e => setForm(f => ({ ...f, degree: e.target.value }))} />
-                                        </div>
-                                        <div>
-                                            <label className="label">Graduation Year</label>
-                                            <input type="number" className="input-field" placeholder="2022"
-                                                value={form.graduationYear} onChange={e => setForm(f => ({ ...f, graduationYear: e.target.value }))} />
-                                        </div>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div>
-                                        <label className="label">Company Name</label>
-                                        <input id="reg-company-name" type="text" className="input-field" placeholder="TechCorp Inc."
-                                            value={form.companyName} onChange={e => setForm(f => ({ ...f, companyName: e.target.value }))} required />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="label">Industry</label>
-                                            <input type="text" className="input-field" placeholder="Technology"
-                                                value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} />
-                                        </div>
-                                        <div>
-                                            <label className="label">Location</label>
-                                            <input type="text" className="input-field" placeholder="Mumbai"
-                                                value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} />
-                                        </div>
-                                    </div>
-                                </>
-                            )}
+                            <div>
+                                <label className="label">Full Name</label>
+                                <input id="reg-name" type="text" className="input-field" placeholder="John Doe"
+                                    value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="label">Degree</label>
+                                    <input type="text" className="input-field" placeholder="B.Tech CS"
+                                        value={form.degree} onChange={e => setForm(f => ({ ...f, degree: e.target.value }))} />
+                                </div>
+                                <div>
+                                    <label className="label">Graduation Year</label>
+                                    <input type="number" className="input-field" placeholder="2022"
+                                        value={form.graduationYear} onChange={e => setForm(f => ({ ...f, graduationYear: e.target.value }))} />
+                                </div>
+                            </div>
 
                             <div>
                                 <label className="label">Email Address</label>
@@ -191,12 +135,6 @@ export default function Register() {
                                     </button>
                                 </div>
                             </div>
-
-                            {role === 'company' && (
-                                <p className="text-yellow-400/70 text-xs bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
-                                    ⚠️ Company accounts require admin approval before posting jobs.
-                                </p>
-                            )}
 
                             <button id="reg-submit" type="submit" disabled={isLoading}
                                 className="btn-primary w-full flex items-center justify-center gap-2 py-3.5 mt-2">

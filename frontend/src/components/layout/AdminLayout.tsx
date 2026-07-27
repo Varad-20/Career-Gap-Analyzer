@@ -8,20 +8,9 @@ export default function AdminLayout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    // Fetch pending companies count for the badge
-    const { data: companiesData } = useQuery({
-        queryKey: ['adminCompanies'],
-        queryFn: () => adminAPI.getCompanies().then(r => r.data.companies),
-        refetchInterval: 30000, // auto-refresh every 30s
-    });
-    const pendingCount = (companiesData || []).filter((c: { isApproved: boolean }) => !c.isApproved).length;
-
-    const navItems = [
+    const navItems: { to: string; icon: any; label: string; badge?: number }[] = [
         { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Analytics' },
-        { to: '/admin/companies', icon: Building2, label: 'Companies', badge: pendingCount },
         { to: '/admin/students', icon: Users, label: 'Students' },
-        { to: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
-        { to: '/admin/applications', icon: FileText, label: 'Applications' },
         { to: '/admin/course-review', icon: BookOpen, label: 'Course Review' },
     ];
 
@@ -55,16 +44,7 @@ export default function AdminLayout() {
                     </div>
                 </div>
 
-                {/* Pending alert in sidebar */}
-                {pendingCount > 0 && (
-                    <div className="mx-3 mt-3 px-3 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl flex items-center gap-2 cursor-pointer"
-                        onClick={() => navigate('/admin/companies')}>
-                        <AlertTriangle className="w-4 h-4 text-yellow-400 flex-shrink-0" />
-                        <p className="text-yellow-300 text-xs">
-                            <span className="font-bold">{pendingCount}</span> {pendingCount === 1 ? 'company' : 'companies'} pending
-                        </p>
-                    </div>
-                )}
+
 
                 {/* Nav Links */}
                 <nav className="flex-1 p-4 space-y-1">

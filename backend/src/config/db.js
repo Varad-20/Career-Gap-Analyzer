@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
   try {
     let uri = process.env.MONGO_URI;
+    let usingInMemory = false;
 
     // If local MongoDB is not available, use in-memory DB for development
     if (!uri || uri.includes('localhost')) {
@@ -10,12 +11,14 @@ const connectDB = async () => {
         // First try the local MongoDB connection with a short timeout
         await mongoose.connect(uri, { serverSelectionTimeoutMS: 3000 });
         console.log('✅ MongoDB Connected: localhost');
+        await seedAdmin(); // Always seed admin on startup
         return;
       } catch (localErr) {
         console.log('⚠️  Local MongoDB not found. Starting in-memory database...');
         const { MongoMemoryServer } = require('mongodb-memory-server');
         const mongod = await MongoMemoryServer.create();
         uri = mongod.getUri();
+        usingInMemory = true;
         console.log('✅ In-Memory MongoDB started (data resets on restart)');
         console.log('💡 Tip: Install MongoDB locally or use Atlas for persistent data');
 

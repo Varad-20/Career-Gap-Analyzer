@@ -9,8 +9,6 @@ import toast from 'react-hot-toast';
 type Role = 'student' | 'company';
 
 export default function Login() {
-    const [searchParams] = useSearchParams();
-    const [role, setRole] = useState<Role>((searchParams.get('type') as Role) || 'student');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [form, setForm] = useState({ email: '', password: '' });
@@ -23,17 +21,18 @@ export default function Login() {
         setIsLoading(true);
         try {
             let res;
-            if (role === 'student') res = await authAPI.studentLogin(form);
-            else if (role === 'company') res = await authAPI.companyLogin(form);
-            else res = await authAPI.adminLogin(form);
+            if (form.email === 'admin@careergap.com') {
+                res = await authAPI.adminLogin(form);
+            } else {
+                res = await authAPI.studentLogin(form);
+            }
 
             const { token, user } = res.data;
             login(token, user);
             toast.success(`Welcome back, ${user.name}!`);
 
-            if (user.role === 'student') navigate('/student/dashboard');
-            else if (user.role === 'company') navigate('/company/dashboard');
-            else navigate('/admin/dashboard');
+            if (user.role === 'admin') navigate('/admin/dashboard');
+            else navigate('/student/dashboard');
         } catch (err: any) {
             toast.error(err.response?.data?.message || 'Login failed');
         } finally {
@@ -65,20 +64,7 @@ export default function Login() {
                 </div>
 
                 <div className="glass-card p-8">
-                    {/* Role Tabs */}
-                    <div className="flex gap-2 mb-8 p-1 bg-white/5 rounded-xl">
-                        {(['student', 'company'] as Role[]).map(r => (
-                            <button key={r} onClick={() => setRole(r)}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${role === r
-                                    ? 'bg-primary-500 text-white shadow-lg'
-                                    : 'text-white/50 hover:text-white'
-                                    }`}
-                            >
-                                {r === 'student' ? <User className="w-4 h-4" /> : <Building2 className="w-4 h-4" />}
-                                {r === 'student' ? 'Student' : 'Company'}
-                            </button>
-                        ))}
-                    </div>
+
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
