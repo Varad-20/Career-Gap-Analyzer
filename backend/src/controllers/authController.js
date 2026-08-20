@@ -163,3 +163,76 @@ exports.loginAdmin = async (req, res) => {
 exports.getMe = async (req, res) => {
     res.json({ success: true, user: req.user });
 };
+
+// ─── COORDINATOR AUTH ──────────────────────────────────────────────────────────
+const Coordinator = require('../models/Coordinator');
+const College = require('../models/College');
+
+exports.registerCoordinator = async (req, res) => {
+    try {
+        const { name, email, password, phone, designation, department, collegeCode } = req.body;
+
+        const existing = await Coordinator.findOne({ email });
+        if (existing) return res.status(400).json({ success: false, message: 'Email already registered' });
+
+        // Find the college by code
+        const college = await College.findOne({ code: collegeCode?.toUpperCase() });
+        if (!college) return res.status(404).json({ success: false, message: `College with code "${collegeCode}" not found. Contact admin.` });
+        if (!college.isVerified) return res.status(403).json({ success: false, message: 'College is not yet verified by admin' });
+
+        const coordinator = await Coordinator.create({ name, email, password, phone, designation, department, college: college._id });
+        await College.findByIdAndUpdate(college._id, { coordinator: coordinator._id });
+
+        const token = generateToken(coordinator._id);
+        res.status(201).json({
+            success: true, token,
+            user: { id: coordinator._id, name, email, role: 'coordinator', college: { id: college._id, name: college.name, code: college.code } }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.loginCoordinator = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const coordinator = await Coordinator.findOne({ email }).populate('college', 'name code city isVerified');
+        if (!coordinator || !(await coordinator.comparePassword(password))) {
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        }
+        if (!coordinator.isActive) return res.status(403).json({ success: false, message: 'Account deactivated' });
+
+        await Coordinator.findByIdAndUpdate(coordinator._id, { lastLogin: new Date() });
+        const token = generateToken(coordinator._id);
+        res.json({
+            success: true, token,
+            user: { id: coordinator._id, name: coordinator.name, email, role: 'coordinator', college: coordinator.college }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─── COLLEGE REGISTRATION (by admin or self) ──────────────────────────────────
+exports.registerCollege = async (req, res) => {
+    try {
+        const { name, code, email, phone, address, city, state, website, departments, currentBatch, affiliatedUniversity } = req.body;
+
+        const existing = await College.findOne({ $or: [{ email }, { code: code?.toUpperCase() }] });
+        if (existing) return res.status(400).json({ success: false, message: 'College already registered with this email or code' });
+
+        const college = await College.create({
+            name, code: code?.toUpperCase(), email, phone, address, city, state, website,
+            departments, currentBatch, affiliatedUniversity,
+            isVerified: false,
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'College registered. Awaiting admin verification.',
+            college: { id: college._id, name, code: college.code }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};

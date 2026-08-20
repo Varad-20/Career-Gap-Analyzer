@@ -21,7 +21,9 @@ export default function Login() {
         setIsLoading(true);
         try {
             let res;
-            if (form.email === 'admin@careergap.com') {
+            // Check if email matches the hardcoded admin email
+            const isAdminEmail = form.email.toLowerCase() === 'admin@careergap.com';
+            if (isAdminEmail) {
                 res = await authAPI.adminLogin(form);
             } else {
                 res = await authAPI.studentLogin(form);
@@ -34,7 +36,7 @@ export default function Login() {
             if (user.role === 'admin') navigate('/admin/dashboard');
             else navigate('/student/dashboard');
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Login failed');
+            toast.error(err.response?.data?.message || 'Invalid email or password');
         } finally {
             setIsLoading(false);
         }
@@ -137,16 +139,9 @@ export default function Login() {
                         <p className="text-white/30 text-xs">
                             Admin?{' '}
                             <button
-                                onClick={async () => {
+                                onClick={() => {
                                     setForm({ email: 'admin@careergap.com', password: 'Admin@123' });
-                                    // trigger admin login
-                                    try {
-                                        const res = await authAPI.adminLogin({ email: 'admin@careergap.com', password: 'Admin@123' });
-                                        login(res.data.token, res.data.user);
-                                        navigate('/admin/dashboard');
-                                    } catch {
-                                        toast.error('Seed admin first: POST /api/admin/seed');
-                                    }
+                                    toast('Admin credentials filled — click Sign In', { icon: '🔐' });
                                 }}
                                 className="text-red-400 hover:text-red-300"
                             >

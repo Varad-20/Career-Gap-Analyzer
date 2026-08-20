@@ -26,10 +26,9 @@ const companySchema = new mongoose.Schema({
     }]
 }, { timestamps: true });
 
-companySchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+companySchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     this.password = await bcrypt.hash(this.password, 12);
-    next();
 });
 
 companySchema.methods.comparePassword = async function (candidatePassword) {

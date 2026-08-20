@@ -84,14 +84,42 @@ const studentSchema = new mongoose.Schema({
         message: String,
         read: { type: Boolean, default: false },
         createdAt: { type: Date, default: Date.now }
-    }]
+    }],
+    // ── Placement / College Profile ─────────────────────────────────────────
+    college: { type: mongoose.Schema.Types.ObjectId, ref: 'College' },
+    enrollmentNo: { type: String, default: '' },   // College roll / PRN number
+    branch: {
+        type: String,
+        enum: ['CS', 'IT', 'ECE', 'EE', 'ME', 'Civil', 'Chemical', 'MBA', 'MCA', 'Other', ''],
+        default: ''
+    },
+    batch: { type: Number },                        // Graduation year e.g. 2025
+    cgpa: { type: Number, default: 0, min: 0, max: 10 },
+    percentage10th: { type: Number, default: 0, min: 0, max: 100 },
+    percentage12th: { type: Number, default: 0, min: 0, max: 100 },
+    activeBacklogs: { type: Number, default: 0 },
+    totalBacklogs: { type: Number, default: 0 },
+
+    // Placement Status
+    placementStatus: {
+        type: String,
+        enum: ['not_placed', 'placed', 'opted_out'],
+        default: 'not_placed'
+    },
+    placedAt: {
+        company: { type: String, default: '' },
+        role: { type: String, default: '' },
+        package: { type: Number, default: 0 },  // LPA
+        date: { type: Date },
+        driveId: { type: mongoose.Schema.Types.ObjectId, ref: 'PlacementDrive' },
+    },
+
 }, { timestamps: true });
 
 // Hash password before save
-studentSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+studentSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     this.password = await bcrypt.hash(this.password, 12);
-    next();
 });
 
 // Compare password

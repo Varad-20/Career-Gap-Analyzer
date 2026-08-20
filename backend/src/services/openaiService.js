@@ -12,7 +12,7 @@ if (hasGeminiKey) {
 /**
  * Analyzes resume text using Gemini AI and extracts structured data
  * @param {string} resumeText - Raw text extracted from PDF
- * @returns {object} Structured resume data
+ * @returns {object} Structured resume data including domain + job-search keywords
  */
 const analyzeResume = async (resumeText) => {
 
@@ -32,6 +32,10 @@ ${resumeText}
 
 Extract and return ONLY a valid JSON object with this exact structure (No markdown code blocks, just raw JSON):
 {
+  "domain": "Web Development",
+  "primaryRole": "Frontend Developer",
+  "topSkills": ["React", "JavaScript", "CSS"],
+  "searchKeywords": ["React Frontend Developer", "JavaScript Engineer", "UI Developer React"],
   "skills": ["skill1", "skill2"],
   "graduationYear": 2020,
   "gapDuration": 6,
@@ -48,12 +52,15 @@ Extract and return ONLY a valid JSON object with this exact structure (No markdo
 }
 
 Rules:
+- domain: One of: "Web Development", "AI/ML", "Data Science", "Mobile Development", "DevOps/Cloud", "Backend Development", "Full Stack", "Data Engineering", "Cybersecurity", "UI/UX Design", "Business Analysis", "Other"
+- primaryRole: Single best-fit job title that exactly matches what this resume is for
+- topSkills: Top 3-5 most important/prominent skills from this resume
+- searchKeywords: 3-4 focused job search query strings to find matching jobs (combine role + key skills)
 - gapDuration: Calculate total career gap in months (0 if no gap)
 - gapRiskLevel: "Low" (0-6 months), "Medium" (7-12 months), "High" (>12 months)
 - resumeScore: Calculate 0-100 based on skills diversity, experience relevance, and completeness
 - gapJustification: Write a professional, compassionate 2-3 sentence explanation for the gap
 - resumeSuggestions: 3-5 actionable improvement suggestions
-- suggestedRoles: 3-5 job roles matching the candidate's profile
 `;
 
             const result = await model.generateContent(prompt);
@@ -66,47 +73,125 @@ Rules:
         }
     }
 
-    // 2. ─── FALLBACK: SMART EXTRACTION IF APIs FAIL OR ARE MISSING ───
+    // 2. ── FALLBACK: SMART EXTRACTION IF APIs FAIL OR ARE MISSING ──
 
-    // Basic skill extraction using a predefined list and regex
-    const commonSkills = ['javascript', 'python', 'java', 'c++', 'react', 'node.js', 'express', 'mongodb', 'sql', 'html', 'css', 'typescript', 'aws', 'docker', 'git', 'machine learning', 'data analysis', 'ai', 'communication', 'leadership', 'management', 'marketing', 'sales'];
     const textLower = resumeText.toLowerCase();
+
+    // Domain detection keyword map
+    const domainKeywords = {
+        'AI/ML': ['machine learning', 'deep learning', 'neural network', 'tensorflow', 'pytorch', 'nlp', 'computer vision', 'scikit', 'keras', 'llm', 'generative ai', 'huggingface'],
+        'Data Science': ['data science', 'data analysis', 'pandas', 'numpy', 'matplotlib', 'seaborn', 'statistics', 'tableau', 'power bi', 'r language', 'jupyter'],
+        'Web Development': ['react', 'angular', 'vue', 'html', 'css', 'javascript', 'typescript', 'next.js', 'tailwind', 'frontend', 'web developer'],
+        'Full Stack': ['full stack', 'fullstack', 'node.js', 'express', 'mongodb', 'rest api', 'graphql'],
+        'Backend Development': ['spring boot', 'django', 'flask', 'fastapi', 'microservices', 'postgresql', 'mysql', 'redis'],
+        'Mobile Development': ['android', 'ios', 'react native', 'flutter', 'kotlin', 'swift', 'xamarin'],
+        'DevOps/Cloud': ['docker', 'kubernetes', 'aws', 'azure', 'gcp', 'ci/cd', 'jenkins', 'terraform', 'ansible', 'devops'],
+        'Data Engineering': ['spark', 'hadoop', 'kafka', 'airflow', 'etl', 'data pipeline', 'bigquery', 'snowflake'],
+        'UI/UX Design': ['figma', 'ux design', 'ui design', 'wireframe', 'prototyping', 'user research', 'adobe xd'],
+        'Cybersecurity': ['cybersecurity', 'penetration testing', 'ethical hacking', 'network security', 'siem', 'firewalls'],
+    };
+
+    // Detect domain by counting keyword matches
+    let bestDomain = 'Other';
+    let bestScore = 0;
+    for (const [domain, keywords] of Object.entries(domainKeywords)) {
+        const score = keywords.filter(k => textLower.includes(k)).length;
+        if (score > bestScore) { bestScore = score; bestDomain = domain; }
+    }
+
+    // All tech skills
+    const commonSkills = [
+        'javascript', 'typescript', 'python', 'java', 'c++', 'c#', 'go', 'rust', 'ruby', 'php',
+        'react', 'angular', 'vue', 'next.js', 'html', 'css', 'tailwind',
+        'node.js', 'express', 'django', 'flask', 'fastapi', 'spring boot',
+        'mongodb', 'postgresql', 'mysql', 'redis', 'elasticsearch',
+        'tensorflow', 'pytorch', 'scikit-learn', 'pandas', 'numpy',
+        'aws', 'azure', 'gcp', 'docker', 'kubernetes', 'git',
+        'machine learning', 'deep learning', 'nlp', 'computer vision',
+        'react native', 'flutter', 'kotlin', 'swift',
+        'figma', 'sql', 'graphql', 'rest api', 'microservices',
+    ];
 
     const extractedSkills = commonSkills.filter(skill => {
         const escapedSkill = skill.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-        const regex = new RegExp('\\b' + escapedSkill + '\\b', 'i');
-        return regex.test(textLower);
+        return new RegExp('\\b' + escapedSkill + '\\b', 'i').test(textLower);
     }).map(s => s.charAt(0).toUpperCase() + s.slice(1));
 
-    // Basic heuristic for gap duration (randomized for fallback if no clear dates exist)
+    // Build domain-specific suggested roles + search keywords
+    const domainRoleMap = {
+        'AI/ML': {
+            roles: ['Machine Learning Engineer', 'AI Engineer', 'Data Scientist', 'NLP Engineer'],
+            keywords: ['Machine Learning Engineer Python', 'AI Engineer deep learning', 'ML Engineer TensorFlow'],
+            primaryRole: 'Machine Learning Engineer',
+        },
+        'Data Science': {
+            roles: ['Data Scientist', 'Data Analyst', 'Business Intelligence Analyst'],
+            keywords: ['Data Scientist Python SQL', 'Data Analyst Power BI', 'Business Intelligence Engineer'],
+            primaryRole: 'Data Scientist',
+        },
+        'Web Development': {
+            roles: ['Frontend Developer', 'UI Engineer', 'React Developer', 'Web Developer'],
+            keywords: ['React Frontend Developer', 'JavaScript Engineer', 'UI Developer React TypeScript'],
+            primaryRole: 'Frontend Developer',
+        },
+        'Full Stack': {
+            roles: ['Full Stack Developer', 'Full Stack Engineer', 'Software Engineer'],
+            keywords: ['Full Stack Developer React Node.js', 'Software Engineer JavaScript', 'MERN Stack Developer'],
+            primaryRole: 'Full Stack Developer',
+        },
+        'Backend Development': {
+            roles: ['Backend Developer', 'Software Engineer', 'API Developer'],
+            keywords: ['Backend Developer Node.js Python', 'Software Engineer Java Spring', 'API Developer REST microservices'],
+            primaryRole: 'Backend Development',
+        },
+        'Mobile Development': {
+            roles: ['Android Developer', 'iOS Developer', 'React Native Developer', 'Flutter Developer'],
+            keywords: ['Android Developer Kotlin', 'React Native Developer', 'Flutter Mobile Engineer'],
+            primaryRole: 'Mobile Developer',
+        },
+        'DevOps/Cloud': {
+            roles: ['DevOps Engineer', 'Cloud Engineer', 'SRE', 'Platform Engineer'],
+            keywords: ['DevOps Engineer AWS Docker', 'Cloud Engineer Kubernetes', 'SRE Platform Engineer'],
+            primaryRole: 'DevOps Engineer',
+        },
+        'Data Engineering': {
+            roles: ['Data Engineer', 'ETL Developer', 'Big Data Engineer'],
+            keywords: ['Data Engineer Spark Kafka', 'ETL Developer Python', 'Big Data Engineer AWS'],
+            primaryRole: 'Data Engineer',
+        },
+        'UI/UX Design': {
+            roles: ['UI/UX Designer', 'Product Designer', 'UX Researcher'],
+            keywords: ['UI UX Designer Figma', 'Product Designer user research', 'Frontend Designer React'],
+            primaryRole: 'UI/UX Designer',
+        },
+    };
+
+    const domainMeta = domainRoleMap[bestDomain] || {
+        roles: ['Software Engineer', 'Business Analyst', 'Product Manager'],
+        keywords: ['Software Engineer', 'Developer', 'Analyst'],
+        primaryRole: 'Software Engineer',
+    };
+
     const gapDuration = (textLower.includes('career gap') || textLower.includes('employment gap') || textLower.includes('career break')) ? 6 : 0;
     const gapRiskLevel = gapDuration > 12 ? 'High' : gapDuration > 6 ? 'Medium' : 'Low';
-
-    // Resume Score based on text length and skills found
     let resumeScore = 40;
     if (resumeText.length > 500) resumeScore += 10;
     if (resumeText.length > 1500) resumeScore += 10;
-    resumeScore += Math.min(extractedSkills.length * 5, 40);
-
-    // Suggested Roles based on skills
-    const suggestedRoles = [];
-    if (extractedSkills.includes('React') || extractedSkills.includes('Html')) suggestedRoles.push('Frontend Developer', 'UI Engineer');
-    if (extractedSkills.includes('Node.js') || extractedSkills.includes('Python') || extractedSkills.includes('Java')) suggestedRoles.push('Backend Developer', 'Software Engineer');
-    if (extractedSkills.includes('Machine learning') || extractedSkills.includes('Data analysis')) suggestedRoles.push('Data Scientist', 'ML Engineer');
-    if (suggestedRoles.length === 0) suggestedRoles.push('Software Engineer', 'Business Analyst', 'Product Manager');
-
-    // Deduplicate suggestions
-    const finalRoles = [...new Set(suggestedRoles)].slice(0, 3);
+    resumeScore += Math.min(extractedSkills.length * 4, 40);
 
     return {
-        success: true, // We set to true to hide the warning in the UI, it's realistically extracted!
+        success: true,
         data: {
+            domain: bestDomain,
+            primaryRole: domainMeta.primaryRole,
+            topSkills: extractedSkills.slice(0, 5),
+            searchKeywords: domainMeta.keywords,
             skills: extractedSkills.length ? extractedSkills : ['Communication', 'Teamwork', 'Problem Solving'],
             graduationYear: new Date().getFullYear() - 1,
             gapDuration,
             gapRiskLevel,
             experienceTimeline: [],
-            suggestedRoles: finalRoles,
+            suggestedRoles: domainMeta.roles,
             education: [],
             gapJustification: 'I took some dedicated time away from formal employment to focus on advancing my technical skillsets and working on independent self-driven projects. This gap has made me a more adaptable, focused, and resilient professional ready to contribute immediately to a collaborative team.',
             resumeSuggestions: [

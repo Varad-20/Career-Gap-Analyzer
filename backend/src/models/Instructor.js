@@ -31,10 +31,9 @@ const instructorSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-instructorSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+instructorSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     this.password = await bcrypt.hash(this.password, 12);
-    next();
 });
 
 instructorSchema.methods.comparePassword = async function (candidatePassword) {

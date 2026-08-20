@@ -2,9 +2,9 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Upload, FileText, Sparkles, CheckCircle, AlertTriangle,
+    Upload, FileText, Sparkles, CheckCircle,
     TrendingUp, Brain, RefreshCw, X, Star, Lightbulb,
-    Building2, MapPin, ArrowRight, Briefcase, Globe, BadgeCheck, Bot
+    ArrowRight, Bot
 } from 'lucide-react';
 import { studentAPI } from '../../services/api.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
@@ -14,6 +14,10 @@ import toast from 'react-hot-toast';
 import { Student } from '../../types';
 
 interface AnalysisResult {
+    domain?: string;
+    primaryRole?: string;
+    topSkills?: string[];
+    searchKeywords?: string[];
     skills: string[];
     gapDuration: number;
     gapRiskLevel: string;
@@ -63,7 +67,7 @@ export default function ResumeUpload() {
                 suggestedRoles: student.suggestedRoles || [],
                 gapJustification: student.gapJustification || '',
                 resumeSuggestions: student.resumeSuggestions || [],
-                aiPowered: true
+                aiPowered: true,
             };
         }
         return null;
@@ -75,9 +79,9 @@ export default function ResumeUpload() {
     const { data: matchData, refetch: refetchMatches } = useQuery({
         queryKey: ['resumePageMatches'],
         queryFn: () => studentAPI.getMatches().then(r => r.data.matches as JobMatch[]),
-        enabled: !!analysis, // only fetch after analysis done
+        enabled: !!analysis,
     });
-    const matches = matchData || [];
+    const _matches = matchData || [];
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const f = acceptedFiles[0];
@@ -103,17 +107,19 @@ export default function ResumeUpload() {
 
         try {
             const res = await studentAPI.uploadResume(formData);
-            setAnalysis(res.data.analysis);
+            const analysisData = res.data.analysis;
+            setAnalysis(analysisData);
             updateUser({ ...user!, ...(res.data.student) });
-            
-            // Invalidate other caches so agent & skill gap update immediately
+
+            // Invalidate caches so agent & skill gap update
             queryClient.invalidateQueries({ queryKey: ['agent-jobs'] });
             queryClient.invalidateQueries({ queryKey: ['agent-status'] });
             queryClient.invalidateQueries({ queryKey: ['skill-gap'] });
             queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
-            
-            toast.success('Resume analyzed successfully! 🎉');
-            // Trigger job match fetch
+
+            const domainMsg = analysisData.domain ? `🎯 ${analysisData.domain} resume detected` : 'Resume analyzed';
+            const roleMsg = analysisData.primaryRole ? ` → Searching ${analysisData.primaryRole} jobs!` : ' successfully!';
+            toast.success(domainMsg + roleMsg, { duration: 4000 });
             setTimeout(() => refetchMatches(), 500);
         } catch (err: any) {
             toast.error(err.response?.data?.message || 'Upload failed');
@@ -135,16 +141,10 @@ export default function ResumeUpload() {
         }
     };
 
-    const getScoreColor = (score: number) => {
-        if (score >= 70) return 'text-emerald-400';
-        if (score >= 50) return 'text-yellow-400';
-        return 'text-red-400';
-    };
-
     return (
         <div className="p-8 space-y-8 max-w-4xl">
             <div>
-                <h1 className="text-2xl font-bold text-white">Resume Upload & AI Analysis</h1>
+                <h1 className="text-2xl font-bold text-white">Resume Upload &amp; AI Analysis</h1>
                 <p className="text-white/50 mt-1">Upload your PDF resume and let our AI extract and analyze it</p>
             </div>
 
@@ -156,10 +156,11 @@ export default function ResumeUpload() {
 
                 <div
                     {...getRootProps()}
-                    className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200 ${isDragActive
-                        ? 'border-primary-500 bg-primary-500/10'
-                        : 'border-white/20 hover:border-primary-500/50 hover:bg-white/5'
-                        }`}
+                    className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200 ${
+                        isDragActive
+                            ? 'border-primary-500 bg-primary-500/10'
+                            : 'border-white/20 hover:border-primary-500/50 hover:bg-white/5'
+                    }`}
                 >
                     <input {...getInputProps()} />
                     <div className="flex flex-col items-center gap-4">
@@ -217,8 +218,8 @@ export default function ResumeUpload() {
                         </div>
                         <div className="space-y-2 text-xs text-white/40">
                             <p>✅ Extracting text from PDF</p>
-                            <p>⏳ Running smart analysis</p>
-                            <p>⏳ Computing skill gaps & resume score</p>
+                            <p>⏳ Detecting career domain...</p>
+                            <p>⏳ Computing skill gaps &amp; resume score</p>
                         </div>
                     </motion.div>
                 )}
@@ -232,6 +233,45 @@ export default function ResumeUpload() {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-6"
                     >
+                        {/* ✨ Domain Detection Banner */}
+                        {(analysis.domain || analysis.primaryRole) && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="glass-card p-5 border border-primary-500/30 bg-gradient-to-r from-primary-500/10 to-violet-500/10"
+                            >
+                                <div className="flex items-start justify-between flex-wrap gap-4">
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Bot className="w-5 h-5 text-primary-400" />
+                                            <span className="text-primary-400 font-semibold text-sm">AI Resume Classification</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-3 items-center">
+                                            {analysis.domain && (
+                                                <span className="px-3 py-1.5 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 font-bold text-sm">
+                                                    🎯 {analysis.domain}
+                                                </span>
+                                            )}
+                                            {analysis.primaryRole && (
+                                                <span className="text-white font-medium">
+                                                    → Best-fit role: <span className="text-emerald-400">{analysis.primaryRole}</span>
+                                                </span>
+                                            )}
+                                        </div>
+                                        {analysis.searchKeywords?.length ? (
+                                            <p className="text-white/40 text-xs mt-2">
+                                                🔍 Searching: {analysis.searchKeywords.slice(0, 2).join(' · ')}
+                                            </p>
+                                        ) : null}
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                        Jobs being fetched...
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
                         {/* Score Overview */}
                         <div className="grid md:grid-cols-3 gap-4">
                             {[
@@ -254,7 +294,12 @@ export default function ResumeUpload() {
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
                                     {analysis.skills.map(skill => (
-                                        <span key={skill} className="badge-blue">{skill}</span>
+                                        <span
+                                            key={skill}
+                                            className={`badge-blue ${analysis.topSkills?.includes(skill) ? 'ring-1 ring-primary-400' : ''}`}
+                                        >
+                                            {analysis.topSkills?.includes(skill) ? '⭐ ' : ''}{skill}
+                                        </span>
                                     ))}
                                     {!analysis.skills.length && <p className="text-white/40 text-sm">No skills extracted</p>}
                                 </div>
@@ -296,8 +341,11 @@ export default function ResumeUpload() {
                                     <h3 className="text-white font-semibold flex items-center gap-2">
                                         <Brain className="w-4 h-4 text-accent-400" /> Gap Justification
                                     </h3>
-                                    <button onClick={handleGenerateJustification} disabled={generatingJustification}
-                                        className="btn-ghost text-xs flex items-center gap-1">
+                                    <button
+                                        onClick={handleGenerateJustification}
+                                        disabled={generatingJustification}
+                                        className="btn-ghost text-xs flex items-center gap-1"
+                                    >
                                         <RefreshCw className={`w-3.5 h-3.5 ${generatingJustification ? 'animate-spin' : ''}`} />
                                         Regenerate
                                     </button>
@@ -308,16 +356,24 @@ export default function ResumeUpload() {
                             </div>
                         </div>
 
-                        {/* Launch AI Agent Quick CTA */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                            className="flex flex-col items-center justify-center p-8 glass-card border border-primary-500/20 bg-gradient-to-r from-primary-500/10 to-violet-500/10 text-center rounded-2xl">
+                        {/* Launch AI Agent CTA */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="flex flex-col items-center justify-center p-8 glass-card border border-primary-500/20 bg-gradient-to-r from-primary-500/10 to-violet-500/10 text-center rounded-2xl"
+                        >
                             <Bot className="w-12 h-12 text-primary-400 mb-3" />
-                            <h3 className="text-white font-bold text-lg">Your Resume Analysis is Ready!</h3>
+                            <h3 className="text-white font-bold text-lg">
+                                {analysis.domain ? `${analysis.domain} Jobs Ready!` : 'Your Resume Analysis is Ready!'}
+                            </h3>
                             <p className="text-white/50 text-sm max-w-md mt-1 mb-5">
-                                Now let our AI Career Agent search live, gap-friendly jobs on the internet tailored specifically to your skills and suggestions.
+                                {analysis.primaryRole
+                                    ? `AI is searching live ${analysis.primaryRole} jobs tailored to your resume. Click below to view results.`
+                                    : 'Now let our AI Career Agent search live, gap-friendly jobs tailored specifically to your skills.'}
                             </p>
                             <button onClick={() => navigate('/student/agent')} className="btn-primary flex items-center gap-2 py-3 px-8">
-                                <Sparkles className="w-4 h-4" /> Launch AI Career Agent <ArrowRight className="w-4 h-4" />
+                                <Sparkles className="w-4 h-4" /> View Matched Jobs <ArrowRight className="w-4 h-4" />
                             </button>
                         </motion.div>
                     </motion.div>

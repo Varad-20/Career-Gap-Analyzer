@@ -7,16 +7,35 @@ const api = axios.create({
 
 // Attach JWT token to every request
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token') || localStorage.getItem('instructorToken');
+    let token = null;
+
+    // Determine which token to use based on the API route
+    if (config.url?.startsWith('/coordinator') || config.url?.startsWith('/auth/coordinator') || config.url?.startsWith('/auth/college')) {
+        token = localStorage.getItem('coordinatorToken');
+    } else if (config.url?.startsWith('/instructor') || config.url?.startsWith('/auth/instructor')) {
+        token = localStorage.getItem('instructorToken');
+    } else if (config.url?.startsWith('/company') || config.url?.startsWith('/auth/company')) {
+        token = localStorage.getItem('companyToken');
+    } else {
+        token = localStorage.getItem('token'); // default student token
+    }
+
+    // Fallback just in case
+    if (!token) {
+        token = localStorage.getItem('token') || localStorage.getItem('coordinatorToken') || localStorage.getItem('instructorToken');
+    }
+
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
 
-// Handle 401 globally
+// Handle 401 globally — but NOT during login/auth requests themselves
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const requestUrl = error.config?.url || '';
+        const isAuthRequest = requestUrl.includes('/auth/');
+        if (error.response?.status === 401 && !isAuthRequest) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/login';
@@ -130,6 +149,43 @@ export const agentAPI = {
     getSkillGap: () => api.post('/agent/skill-gap'),
     getLearningRoadmap: () => api.get('/agent/roadmap'),
     getStatus: () => api.get('/agent/status'),
+};
+
+// ─── PLACEMENT DRIVES (student-facing) ────────────────────────────────────────
+export const drivesAPI = {
+    listDrives: (params?: object) => api.get('/drives', { params }),
+    getDrive: (id: string) => api.get(`/drives/${id}`),
+    register: (id: string) => api.post(`/drives/${id}/register`),
+    getMyApplications: () => api.get('/drives/my-applications'),
+    getMyStatus: (id: string) => api.get(`/drives/${id}/my-status`),
+    withdraw: (id: string) => api.delete(`/drives/${id}/withdraw`),
+};
+
+// ─── COORDINATOR PORTAL ───────────────────────────────────────────────────────
+export const coordinatorAPI = {
+    login: (data: object) => api.post('/auth/coordinator/login', data),
+    register: (data: object) => api.post('/auth/coordinator/register', data),
+    getProfile: () => api.get('/coordinator/profile'),
+    updateProfile: (data: object) => api.put('/coordinator/profile', data),
+    getDashboard: () => api.get('/coordinator/dashboard'),
+    getStudents: (params?: object) => api.get('/coordinator/students', { params }),
+    getPlacementStats: (params?: object) => api.get('/coordinator/placement-stats', { params }),
+    // Drives
+    getDrives: (params?: object) => api.get('/coordinator/drives', { params }),
+    createDrive: (data: object) => api.post('/coordinator/drives', data),
+    updateDrive: (id: string, data: object) => api.put(`/coordinator/drives/${id}`, data),
+    deleteDrive: (id: string) => api.delete(`/coordinator/drives/${id}`),
+    // Applicant pipeline
+    getApplicants: (driveId: string, params?: object) => api.get(`/coordinator/drives/${driveId}/applicants`, { params }),
+    updateRoundResult: (driveId: string, appId: string, data: object) =>
+        api.put(`/coordinator/drives/${driveId}/applicants/${appId}/round`, data),
+    issueOffer: (driveId: string, appId: string, data: object) =>
+        api.post(`/coordinator/drives/${driveId}/offer/${appId}`, data),
+};
+
+// ─── COLLEGE ──────────────────────────────────────────────────────────────────
+export const collegeAPI = {
+    register: (data: object) => api.post('/auth/college/register', data),
 };
 
 export default api;

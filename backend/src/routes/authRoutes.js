@@ -5,8 +5,10 @@ const validate = require('../middleware/validate');
 const {
     registerStudent, loginStudent,
     loginAdmin, getMe,
-    registerInstructor, loginInstructor
+    registerInstructor, loginInstructor,
+    registerCoordinator, loginCoordinator, registerCollege
 } = require('../controllers/authController');
+
 const { protect } = require('../middleware/auth');
 
 // Student auth
@@ -43,5 +45,25 @@ router.post('/instructor/login', [
 
 // Get current user
 router.get('/me', protect, getMe);
+
+// Coordinator auth
+router.post('/coordinator/register', [
+    body('name').notEmpty(),
+    body('email').isEmail(),
+    body('password').isLength({ min: 6 }),
+    body('collegeCode').notEmpty().withMessage('College code is required')
+], validate, registerCoordinator);
+
+router.post('/coordinator/login', [
+    body('email').isEmail(),
+    body('password').notEmpty()
+], validate, loginCoordinator);
+
+// College registration
+router.post('/college/register', [
+    body('name').notEmpty(),
+    body('code').notEmpty().withMessage('College code required (e.g. MIT, VIT)'),
+    body('email').isEmail(),
+], validate, registerCollege);
 
 module.exports = router;

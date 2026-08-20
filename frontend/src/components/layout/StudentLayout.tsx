@@ -1,8 +1,9 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, User, FileText, Target, Briefcase, Bookmark,
-    LogOut, Bell, ChevronRight, Sparkles, BookOpen, MessageSquare, Bot
+    LogOut, Bell, ChevronRight, Sparkles, BookOpen, MessageSquare, Bot, GraduationCap, ClipboardList
 } from 'lucide-react';
+
 import { useAuth } from '../../context/AuthContext';
 import { Student } from '../../types';
 
@@ -15,6 +16,12 @@ const navItems = [
     { to: '/student/skill-up', icon: BookOpen, label: 'Skill Up', highlight: false },
     { to: '/student/queries', icon: MessageSquare, label: 'My Queries', highlight: false },
 ];
+
+const placementNavItems = [
+    { to: '/student/drives', icon: GraduationCap, label: 'Campus Drives', highlight: false },
+    { to: '/student/my-drives', icon: ClipboardList, label: 'My Applications', highlight: false },
+];
+
 
 export default function StudentLayout() {
     const { user, logout } = useAuth();
@@ -85,6 +92,20 @@ export default function StudentLayout() {
                             {highlight && (
                                 <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded-full bg-primary-500/30 text-primary-300 font-bold uppercase tracking-wider">AI</span>
                             )}
+                        </NavLink>
+                    ))}
+
+                    {/* Placement section */}
+                    <div className="pt-4 pb-1">
+                        <p className="text-white/20 text-[10px] font-semibold uppercase tracking-widest px-2 mb-1">
+                            🎓 Placement
+                        </p>
+                    </div>
+                    {placementNavItems.map(({ to, icon: Icon, label }) => (
+                        <NavLink key={to} to={to}
+                            className={({ isActive }) => isActive ? 'sidebar-item-active' : 'sidebar-item'}>
+                            <Icon className="w-5 h-5 flex-shrink-0" />
+                            <span className="text-sm font-medium">{label}</span>
                         </NavLink>
                     ))}
 

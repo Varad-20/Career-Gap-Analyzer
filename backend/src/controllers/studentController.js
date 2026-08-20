@@ -83,10 +83,12 @@ exports.uploadResume = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Could not extract text from PDF. Ensure the PDF is text-based.' });
         }
 
-        // Step 2: Analyze with OpenAI
+        // Step 2: Analyze with Gemini AI (now extracts domain, primaryRole, searchKeywords)
         const { success: aiSuccess, data } = await analyzeResume(resumeText);
 
-        // Step 3: Update student profile with extracted data
+        console.log(`📄 Resume analyzed → Domain: ${data.domain} | Role: ${data.primaryRole} | Skills: [${(data.skills || []).slice(0, 5).join(', ')}]`);
+
+        // Step 3: Update student profile with extracted data + domain info
         const updateData = {
             resumeURL,
             extractedResumeText: resumeText,
@@ -102,7 +104,7 @@ exports.uploadResume = async (req, res) => {
 
         const student = await Student.findByIdAndUpdate(req.user._id, updateData, { new: true }).select('-password');
 
-        // 🤖 Trigger AI Job Search Agent in background (non-blocking)
+        // 🤖 Trigger AI Job Search Agent with RESUME-DRIVEN queries (non-blocking)
         setImmediate(async () => {
             try {
                 const studentProfile = {
@@ -111,13 +113,23 @@ exports.uploadResume = async (req, res) => {
                     location: student.location || 'India',
                     gapDuration: data.gapDuration || 0,
                     degree: data.graduationYear || '',
+                    // ✨ Pass the full resume analysis for domain-targeted search
+                    resumeAnalysis: {
+                        domain: data.domain,
+                        primaryRole: data.primaryRole,
+                        topSkills: data.topSkills || data.skills?.slice(0, 5) || [],
+                        searchKeywords: data.searchKeywords || [],
+                        suggestedRoles: data.suggestedRoles || [],
+                    },
                 };
+
+                console.log(`🤖 Launching resume-targeted job search [${data.domain}] → "${data.primaryRole}"`);
                 const liveJobs = await runJobSearchAgent(studentProfile);
                 await Student.findByIdAndUpdate(req.user._id, {
-                    liveJobResults: liveJobs.slice(0, 20),
+                    liveJobResults: liveJobs.slice(0, 25),
                     lastJobSearchAt: new Date(),
                 });
-                console.log(`✅ AI Agent: Job search completed for student ${req.user._id} — ${liveJobs.length} jobs found`);
+                console.log(`✅ Resume-targeted job search complete: ${liveJobs.length} jobs | Top match: ${liveJobs[0]?.matchScore || 0}%`);
             } catch (agentErr) {
                 console.error('AI Agent background search error:', agentErr.message);
             }
@@ -125,9 +137,13 @@ exports.uploadResume = async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Resume uploaded and analyzed successfully. AI Agent is searching jobs in the background.',
+            message: `Resume analyzed as "${data.domain}" profile. AI Agent is searching ${data.primaryRole} jobs in the background.`,
             student,
             analysis: {
+                domain: data.domain,
+                primaryRole: data.primaryRole,
+                topSkills: data.topSkills,
+                searchKeywords: data.searchKeywords,
                 skills: data.skills,
                 gapDuration: data.gapDuration,
                 gapRiskLevel: data.gapRiskLevel,
@@ -143,6 +159,7 @@ exports.uploadResume = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
 
 // ─── GET MATCHED JOBS ─────────────────────────────────────────────────────────
 

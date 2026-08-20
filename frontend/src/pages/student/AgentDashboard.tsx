@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-    Bot, Sparkles, RefreshCw, MapPin, ExternalLink, Briefcase,
-    Clock, Globe, Building2, ChevronRight, Search, Filter,
-    Zap, Target, TrendingUp, AlertCircle, CheckCircle,
-    Wifi, WifiOff, Star, ArrowUpRight, Upload
+    Bot, Sparkles, RefreshCw, MapPin, Briefcase,
+    Clock, Globe, ChevronRight, Search,
+    Zap, Target, TrendingUp, CheckCircle,
+    Star, ArrowUpRight, Upload, Layers
 } from 'lucide-react';
 import { agentAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -34,22 +34,31 @@ interface LiveJob {
     gapFriendly: boolean;
     matchScore: number;
     matchedSkills?: string[];
+    isLive?: boolean;
+    platformColor?: string;
 }
 
-const SOURCE_COLORS: Record<string, string> = {
-    'LinkedIn': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    'Indeed': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-    'Naukri': 'bg-red-500/20 text-red-400 border-red-500/30',
-    'Wellfound': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-    'Internshala': 'bg-teal-500/20 text-teal-400 border-teal-500/30',
-    'Adzuna': 'bg-green-500/20 text-green-400 border-green-500/30',
+// ─── Platform configuration: brand colors, icons, labels ─────────────────────
+const PLATFORMS: Record<string, { color: string; bg: string; border: string; icon: string; label: string }> = {
+    'LinkedIn':    { color: 'text-[#0A66C2]',   bg: 'bg-[#0A66C2]/15',  border: 'border-[#0A66C2]/30', icon: '💼', label: 'LinkedIn' },
+    'Indeed':      { color: 'text-[#2164F3]',   bg: 'bg-[#2164F3]/15',  border: 'border-[#2164F3]/30', icon: '🔵', label: 'Indeed' },
+    'Naukri':      { color: 'text-[#FF7555]',   bg: 'bg-[#FF7555]/15',  border: 'border-[#FF7555]/30', icon: '🔶', label: 'Naukri' },
+    'Glassdoor':   { color: 'text-[#0CAA41]',   bg: 'bg-[#0CAA41]/15',  border: 'border-[#0CAA41]/30', icon: '🟢', label: 'Glassdoor' },
+    'Wellfound':   { color: 'text-[#F04E23]',   bg: 'bg-[#F04E23]/15',  border: 'border-[#F04E23]/30', icon: '🚀', label: 'Wellfound' },
+    'Internshala': { color: 'text-[#00B4D8]',   bg: 'bg-[#00B4D8]/15',  border: 'border-[#00B4D8]/30', icon: '🎓', label: 'Internshala' },
+    'RemoteOK':    { color: 'text-[#00D4AA]',   bg: 'bg-[#00D4AA]/15',  border: 'border-[#00D4AA]/30', icon: '🌍', label: 'RemoteOK' },
+    'Adzuna':      { color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-emerald-500/30', icon: '🔍', label: 'Adzuna' },
+    'ZipRecruiter':{ color: 'text-green-400',   bg: 'bg-green-500/15',   border: 'border-green-500/30',  icon: '⚡', label: 'ZipRecruiter' },
+    'Shine':       { color: 'text-[#FF6B35]',   bg: 'bg-[#FF6B35]/15',  border: 'border-[#FF6B35]/30', icon: '✨', label: 'Shine' },
+    'Foundit':     { color: 'text-[#7B2FF7]',   bg: 'bg-[#7B2FF7]/15',  border: 'border-[#7B2FF7]/30', icon: '🔮', label: 'Foundit' },
+    'Monster':     { color: 'text-purple-400',  bg: 'bg-purple-500/15',  border: 'border-purple-500/30', icon: '👾', label: 'Monster' },
 };
 
-const getSourceStyle = (source: string) => {
-    for (const [key, cls] of Object.entries(SOURCE_COLORS)) {
-        if (source?.includes(key)) return cls;
+const getPlatformStyle = (source: string) => {
+    for (const [key, style] of Object.entries(PLATFORMS)) {
+        if (source?.includes(key)) return style;
     }
-    return 'bg-white/10 text-white/60 border-white/20';
+    return { color: 'text-white/60', bg: 'bg-white/10', border: 'border-white/20', icon: '🏢', label: source };
 };
 
 const getMatchColor = (score: number) => {
@@ -64,6 +73,37 @@ const getMatchBg = (score: number) => {
     return 'from-orange-500/20 to-red-500/20 border-orange-500/30';
 };
 
+// ─── Platform overview banner ─────────────────────────────────────────────────
+const PlatformBanner = ({ sources }: { sources: string[] }) => {
+    const uniquePlatforms = [...new Set(sources)].filter(Boolean);
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-card p-4"
+        >
+            <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2 text-white/50 text-xs mr-2">
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>Sources searched:</span>
+                </div>
+                {uniquePlatforms.map(src => {
+                    const style = getPlatformStyle(src);
+                    return (
+                        <span
+                            key={src}
+                            className={`text-xs px-2.5 py-1 rounded-lg border font-semibold ${style.bg} ${style.color} ${style.border}`}
+                        >
+                            {style.icon} {style.label}
+                        </span>
+                    );
+                })}
+            </div>
+        </motion.div>
+    );
+};
+
+// ─── Agent thinking state ─────────────────────────────────────────────────────
 const AgentThinkingState = ({ queries }: { queries: string[] }) => (
     <div className="flex flex-col items-center justify-center py-20 gap-6">
         <div className="relative">
@@ -81,13 +121,14 @@ const AgentThinkingState = ({ queries }: { queries: string[] }) => (
         </div>
         <div className="text-center space-y-2">
             <h3 className="text-white font-bold text-xl">AI Career Agent is Working</h3>
-            <p className="text-white/50 text-sm">Searching across LinkedIn, Indeed, Naukri & more...</p>
+            <p className="text-white/50 text-sm">Searching across LinkedIn, Naukri, Indeed, Glassdoor, RemoteOK & more...</p>
         </div>
         <div className="glass-card p-4 w-full max-w-sm space-y-3">
             {[
-                '🔍 Building search queries from your skills...',
-                '🌐 Searching live job boards...',
-                '🧠 Ranking jobs by relevance...',
+                '🔍 Building search queries from your profile...',
+                '🌐 Fetching live jobs from JSearch, Adzuna, RemoteOK...',
+                '🔗 Building platform cards for Naukri, LinkedIn, Glassdoor...',
+                '🧠 Ranking by skill match & relevance...',
                 '✅ Preparing your personalized results...',
             ].map((step, i) => (
                 <motion.div
@@ -106,24 +147,26 @@ const AgentThinkingState = ({ queries }: { queries: string[] }) => (
                 </motion.div>
             ))}
         </div>
-        {queries.length > 0 && (
-            <div className="flex flex-wrap gap-2 justify-center">
-                {queries.map((q, i) => (
+        <div className="flex flex-wrap gap-2 justify-center">
+            {['LinkedIn', 'Naukri', 'Indeed', 'RemoteOK', 'Glassdoor', 'Wellfound', 'Internshala'].map((p, i) => {
+                const style = getPlatformStyle(p);
+                return (
                     <motion.span
-                        key={q}
+                        key={p}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.15 }}
-                        className="px-3 py-1 rounded-full bg-primary-500/20 border border-primary-500/30 text-primary-400 text-xs"
+                        transition={{ delay: i * 0.12 }}
+                        className={`px-3 py-1 rounded-full border text-xs font-semibold ${style.bg} ${style.color} ${style.border}`}
                     >
-                        {q}
+                        {style.icon} {p}
                     </motion.span>
-                ))}
-            </div>
-        )}
+                );
+            })}
+        </div>
     </div>
 );
 
+// ─── Empty state ──────────────────────────────────────────────────────────────
 const EmptyState = ({ hasResume, onSearch, isSearching }: { hasResume: boolean; onSearch: () => void; isSearching: boolean }) => {
     const navigate = useNavigate();
     return (
@@ -133,12 +176,22 @@ const EmptyState = ({ hasResume, onSearch, isSearching }: { hasResume: boolean; 
             </div>
             <div>
                 <h3 className="text-white font-bold text-xl mb-2">AI Career Agent Ready</h3>
-                <p className="text-white/50 max-w-sm">
+                <p className="text-white/50 max-w-md">
                     {hasResume
-                        ? 'Your agent will search LinkedIn, Indeed, Naukri, and more to find gap-friendly jobs tailored to your profile.'
-                        : 'Upload your resume first so the AI can analyze your skills and find the best matching jobs for you.'}
+                        ? 'Your agent will search LinkedIn, Naukri, Indeed, Glassdoor, RemoteOK, Wellfound, Internshala & more to find gap-friendly jobs tailored to your profile.'
+                        : 'Upload your resume first so the AI can analyze your skills and find the best matching jobs across all major job platforms.'}
                 </p>
             </div>
+
+            {/* Platform grid */}
+            <div className="flex flex-wrap gap-2 justify-center max-w-md">
+                {Object.entries(PLATFORMS).slice(0, 8).map(([name, style]) => (
+                    <span key={name} className={`text-xs px-2.5 py-1 rounded-lg border font-medium ${style.bg} ${style.color} ${style.border}`}>
+                        {style.icon} {style.label}
+                    </span>
+                ))}
+            </div>
+
             {hasResume ? (
                 <button
                     onClick={onSearch}
@@ -165,6 +218,23 @@ const EmptyState = ({ hasResume, onSearch, isSearching }: { hasResume: boolean; 
     );
 };
 
+// ─── Source filter dropdown options ──────────────────────────────────────────
+const ALL_SOURCE_OPTIONS = [
+    { value: 'all', label: '🌐 All Platforms' },
+    { value: 'LinkedIn',    label: '💼 LinkedIn' },
+    { value: 'Naukri',      label: '🔶 Naukri' },
+    { value: 'Indeed',      label: '🔵 Indeed' },
+    { value: 'Glassdoor',   label: '🟢 Glassdoor' },
+    { value: 'RemoteOK',    label: '🌍 RemoteOK' },
+    { value: 'Wellfound',   label: '🚀 Wellfound' },
+    { value: 'Internshala', label: '🎓 Internshala' },
+    { value: 'Adzuna',      label: '🔍 Adzuna' },
+    { value: 'Shine',       label: '✨ Shine' },
+    { value: 'Foundit',     label: '🔮 Foundit' },
+    { value: 'ZipRecruiter',label: '⚡ ZipRecruiter' },
+];
+
+// ─── Main component ───────────────────────────────────────────────────────────
 export default function AgentDashboard() {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -172,6 +242,7 @@ export default function AgentDashboard() {
     const [isSearching, setIsSearching] = useState(false);
     const [filters, setFilters] = useState({ search: '', workType: 'all', minMatch: 0, source: 'all' });
     const [expandedJob, setExpandedJob] = useState<string | null>(null);
+    const [showLiveOnly, setShowLiveOnly] = useState(false);
 
     // Fetch agent status
     const { data: statusData } = useQuery({
@@ -193,7 +264,7 @@ export default function AgentDashboard() {
         mutationFn: () => agentAPI.searchJobs(),
         onMutate: () => setIsSearching(true),
         onSuccess: (res) => {
-            toast.success(`🤖 Found ${res.data.count} jobs for you!`);
+            toast.success(`🤖 Found ${res.data.count} jobs across multiple platforms!`);
             queryClient.invalidateQueries({ queryKey: ['agent-jobs'] });
             queryClient.invalidateQueries({ queryKey: ['agent-status'] });
             setIsSearching(false);
@@ -209,17 +280,22 @@ export default function AgentDashboard() {
     const hasResume = statusData?.hasResume ?? (user as any)?.resumeURL;
     const isMock = jobData?.isMock;
     const lastSearched = jobData?.searchedAt;
+    const uniqueSources = [...new Set(jobs.map(j => j.source))].filter(Boolean);
+    const liveJobs = jobs.filter(j => j.isLive);
 
-    // Filter jobs
-    const filtered = jobs.filter(j => {
-        const matchSearch = !filters.search ||
-            j.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-            j.company.toLowerCase().includes(filters.search.toLowerCase());
-        const matchType = filters.workType === 'all' || j.workType?.toLowerCase() === filters.workType.toLowerCase() || (filters.workType === 'remote' && j.isRemote);
-        const matchScore = j.matchScore >= filters.minMatch;
-        const matchSource = filters.source === 'all' || j.source?.toLowerCase().includes(filters.source.toLowerCase());
-        return matchSearch && matchType && matchScore && matchSource;
-    });
+    // Filter jobs and always sort by matchScore descending (highest match first)
+    const filtered = jobs
+        .filter(j => {
+            const matchSearch = !filters.search ||
+                j.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+                j.company.toLowerCase().includes(filters.search.toLowerCase());
+            const matchType = filters.workType === 'all' || j.workType?.toLowerCase() === filters.workType.toLowerCase() || (filters.workType === 'remote' && j.isRemote);
+            const matchScore = j.matchScore >= filters.minMatch;
+            const matchSource = filters.source === 'all' || j.source?.toLowerCase().includes(filters.source.toLowerCase());
+            const matchLive = !showLiveOnly || j.isLive;
+            return matchSearch && matchType && matchScore && matchSource && matchLive;
+        })
+        .sort((a, b) => b.matchScore - a.matchScore);
 
     const handleSearch = () => {
         if (!hasResume) {
@@ -245,6 +321,11 @@ export default function AgentDashboard() {
         }
     };
 
+    // Determine which source filter options are actually present in results
+    const availableSources = ALL_SOURCE_OPTIONS.filter(opt =>
+        opt.value === 'all' || uniqueSources.some(s => s.toLowerCase().includes(opt.value.toLowerCase()))
+    );
+
     return (
         <div className="p-6 lg:p-8 space-y-6">
             {/* Header */}
@@ -257,7 +338,7 @@ export default function AgentDashboard() {
                         AI Career Agent
                     </h1>
                     <p className="text-white/50 mt-1 ml-13">
-                        Automatically finds gap-friendly jobs from LinkedIn, Indeed, Naukri & more
+                        Searches LinkedIn, Naukri, Indeed, Glassdoor, RemoteOK, Wellfound, Internshala & more
                     </p>
                 </div>
 
@@ -301,7 +382,7 @@ export default function AgentDashboard() {
                         { label: 'Jobs Found', value: jobs.length, icon: Briefcase, color: 'text-primary-400' },
                         { label: 'High Match (75%+)', value: jobs.filter(j => j.matchScore >= 75).length, icon: Star, color: 'text-emerald-400' },
                         { label: 'Remote Jobs', value: jobs.filter(j => j.isRemote).length, icon: Globe, color: 'text-blue-400' },
-                        { label: 'Sources Searched', value: new Set(jobs.map(j => j.source)).size, icon: Search, color: 'text-violet-400' },
+                        { label: 'Platforms Searched', value: uniqueSources.length, icon: Layers, color: 'text-violet-400' },
                     ].map(({ label, value, icon: Icon, color }) => (
                         <div key={label} className="glass-card p-4 flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
@@ -316,19 +397,13 @@ export default function AgentDashboard() {
                 </motion.div>
             )}
 
-            {/* Mock data notice */}
-            {isMock && jobs.length > 0 && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20"
-                >
-                    <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                    <p className="text-amber-400/80 text-sm">
-                        <strong>Demo Mode:</strong> Showing intelligent sample jobs. Add a JSearch or Adzuna API key to <code className="bg-white/10 px-1 rounded text-xs">backend/.env</code> for live results from LinkedIn, Indeed & more.
-                    </p>
-                </motion.div>
+            {/* Platform Sources Banner */}
+            {jobs.length > 0 && uniqueSources.length > 0 && (
+                <PlatformBanner sources={uniqueSources} />
             )}
+
+
+
 
             {/* Filters */}
             {jobs.length > 0 && (
@@ -345,6 +420,20 @@ export default function AgentDashboard() {
                             />
                         </div>
                     </div>
+
+                    {/* Platform / Source Filter */}
+                    <div>
+                        <select
+                            className="input-field py-2 text-sm"
+                            value={filters.source}
+                            onChange={e => setFilters(f => ({ ...f, source: e.target.value }))}
+                        >
+                            {availableSources.map(opt => (
+                                <option key={opt.value} value={opt.value} className="bg-gray-900">{opt.label}</option>
+                            ))}
+                        </select>
+                    </div>
+
                     <div>
                         <select
                             className="input-field py-2 text-sm"
@@ -357,6 +446,7 @@ export default function AgentDashboard() {
                             <option value="full-time" className="bg-gray-900">Full-time</option>
                         </select>
                     </div>
+
                     <div>
                         <select
                             className="input-field py-2 text-sm"
@@ -369,6 +459,22 @@ export default function AgentDashboard() {
                             <option value={85} className="bg-gray-900">85%+ Match</option>
                         </select>
                     </div>
+
+                    {/* Live-only toggle */}
+                    {liveJobs.length > 0 && (
+                        <button
+                            onClick={() => setShowLiveOnly(!showLiveOnly)}
+                            className={`flex items-center gap-2 text-xs px-3 py-2 rounded-lg border transition-all ${
+                                showLiveOnly
+                                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                                    : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'
+                            }`}
+                        >
+                            <Radio className="w-3.5 h-3.5" />
+                            Live Only
+                        </button>
+                    )}
+
                     <p className="text-white/40 text-sm ml-auto">{filtered.length} results</p>
                 </div>
             )}
@@ -391,121 +497,139 @@ export default function AgentDashboard() {
             ) : (
                 <div className="space-y-4">
                     <AnimatePresence>
-                        {filtered.map((job, i) => (
-                            <motion.div
-                                key={job.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: Math.min(i * 0.04, 0.5) }}
-                                className="glass-card border border-white/5 hover:border-primary-500/30 transition-all duration-200 overflow-hidden"
-                            >
-                                <div className="p-5 lg:p-6">
-                                    <div className="flex items-start gap-4">
-                                        {/* Company Logo / Letter */}
-                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center text-2xl flex-shrink-0">
-                                            {job.logo || '🏢'}
-                                        </div>
+                        {filtered.map((job, i) => {
+                            const platformStyle = getPlatformStyle(job.source);
+                            return (
+                                <motion.div
+                                    key={job.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: Math.min(i * 0.04, 0.5) }}
+                                    className="glass-card border border-white/5 hover:border-primary-500/30 transition-all duration-200 overflow-hidden"
+                                >
+                                    {/* Live indicator stripe */}
+                                    {job.isLive && (
+                                        <div className="h-0.5 w-full bg-gradient-to-r from-emerald-500/60 via-teal-500/60 to-transparent" />
+                                    )}
 
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-start justify-between gap-3 flex-wrap">
-                                                <div>
-                                                    <h3 className="text-white font-bold text-lg leading-tight">{job.title}</h3>
-                                                    <p className="text-white/60 text-sm mt-0.5">{job.company}</p>
+                                    <div className="p-5 lg:p-6">
+                                        <div className="flex items-start gap-4">
+                                            {/* Company Logo / Platform Icon */}
+                                            <div
+                                                className="w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center text-2xl flex-shrink-0"
+                                                style={{ background: job.platformColor ? `${job.platformColor}20` : undefined }}
+                                            >
+                                                {job.logo || platformStyle.icon}
+                                            </div>
+
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-start justify-between gap-3 flex-wrap">
+                                                    <div>
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <h3 className="text-white font-bold text-lg leading-tight">{job.title}</h3>
+                                                            {job.isLive && (
+                                                                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold tracking-wide">
+                                                                    LIVE
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-white/60 text-sm mt-0.5">{job.company}</p>
+                                                    </div>
+
+                                                    {/* Match Score */}
+                                                    <div className={`flex flex-col items-end flex-shrink-0 bg-gradient-to-br ${getMatchBg(job.matchScore)} border rounded-xl px-3 py-2 min-w-16`}>
+                                                        <p className={`text-xl font-black ${getMatchColor(job.matchScore)}`}>
+                                                            {job.matchScore}%
+                                                        </p>
+                                                        <p className="text-white/40 text-xs">match</p>
+                                                    </div>
                                                 </div>
 
-                                                {/* Match Score */}
-                                                <div className={`flex flex-col items-end flex-shrink-0 bg-gradient-to-br ${getMatchBg(job.matchScore)} border rounded-xl px-3 py-2 min-w-16`}>
-                                                    <p className={`text-xl font-black ${getMatchColor(job.matchScore)}`}>
-                                                        {job.matchScore}%
-                                                    </p>
-                                                    <p className="text-white/40 text-xs">match</p>
+                                                {/* Metadata row */}
+                                                <div className="flex flex-wrap gap-3 mt-3 text-sm text-white/50">
+                                                    {job.location && (
+                                                        <span className="flex items-center gap-1">
+                                                            <MapPin className="w-3.5 h-3.5" /> {job.location}
+                                                        </span>
+                                                    )}
+                                                    <span className="flex items-center gap-1">
+                                                        <Briefcase className="w-3.5 h-3.5" />
+                                                        {job.isRemote ? '🌐 Remote' : job.workType}
+                                                    </span>
+                                                    {job.experienceLevel && (
+                                                        <span className="flex items-center gap-1">
+                                                            <TrendingUp className="w-3.5 h-3.5" /> {job.experienceLevel}
+                                                        </span>
+                                                    )}
+                                                    {(job.salaryDisplay || (job.salaryMin && job.salaryMax)) && (
+                                                        <span className="flex items-center gap-1 text-emerald-400">
+                                                            💰 {job.salaryDisplay || `${job.salaryCurrency} ${job.salaryMin?.toLocaleString()} – ${job.salaryMax?.toLocaleString()}`}
+                                                        </span>
+                                                    )}
+                                                    {job.postedAt && (
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock className="w-3.5 h-3.5" /> {formatDate(job.postedAt)}
+                                                        </span>
+                                                    )}
                                                 </div>
-                                            </div>
 
-                                            {/* Metadata row */}
-                                            <div className="flex flex-wrap gap-3 mt-3 text-sm text-white/50">
-                                                {job.location && (
-                                                    <span className="flex items-center gap-1">
-                                                        <MapPin className="w-3.5 h-3.5" /> {job.location}
+                                                {/* Tags row */}
+                                                <div className="flex flex-wrap gap-2 mt-3">
+                                                    {/* Platform source badge */}
+                                                    <span className={`text-xs px-2 py-1 rounded-lg border font-semibold ${platformStyle.bg} ${platformStyle.color} ${platformStyle.border}`}>
+                                                        {platformStyle.icon} {job.source}
                                                     </span>
-                                                )}
-                                                <span className="flex items-center gap-1">
-                                                    <Briefcase className="w-3.5 h-3.5" />
-                                                    {job.isRemote ? '🌐 Remote' : job.workType}
-                                                </span>
-                                                {job.experienceLevel && (
-                                                    <span className="flex items-center gap-1">
-                                                        <TrendingUp className="w-3.5 h-3.5" /> {job.experienceLevel}
+                                                    {/* Gap friendly badge */}
+                                                    <span className="text-xs px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                                                        <CheckCircle className="w-3 h-3" /> Gap Friendly
                                                     </span>
-                                                )}
-                                                {(job.salaryDisplay || (job.salaryMin && job.salaryMax)) && (
-                                                    <span className="flex items-center gap-1 text-emerald-400">
-                                                        💰 {job.salaryDisplay || `${job.salaryCurrency} ${job.salaryMin?.toLocaleString()} – ${job.salaryMax?.toLocaleString()}`}
-                                                    </span>
-                                                )}
-                                                {job.postedAt && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Clock className="w-3.5 h-3.5" /> {formatDate(job.postedAt)}
-                                                    </span>
-                                                )}
-                                            </div>
+                                                    {/* Required skills */}
+                                                    {job.requiredSkills?.slice(0, 4).map(s => (
+                                                        <span key={s} className={`text-xs px-2 py-1 rounded-lg ${(job.matchedSkills || []).some(ms => ms.toLowerCase().includes(s.toLowerCase())) ? 'bg-primary-500/20 text-primary-300 border border-primary-500/20' : 'bg-white/5 text-white/40'}`}>
+                                                            {s}
+                                                        </span>
+                                                    ))}
+                                                </div>
 
-                                            {/* Tags row */}
-                                            <div className="flex flex-wrap gap-2 mt-3">
-                                                {/* Source badge */}
-                                                <span className={`text-xs px-2 py-1 rounded-lg border font-medium ${getSourceStyle(job.source)}`}>
-                                                    {job.source}
-                                                </span>
-                                                {/* Gap friendly badge */}
-                                                <span className="text-xs px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                                                    <CheckCircle className="w-3 h-3" /> Gap Friendly
-                                                </span>
-                                                {/* Required skills */}
-                                                {job.requiredSkills?.slice(0, 4).map(s => (
-                                                    <span key={s} className={`text-xs px-2 py-1 rounded-lg ${(job.matchedSkills || []).some(ms => ms.toLowerCase().includes(s.toLowerCase())) ? 'bg-primary-500/20 text-primary-300 border border-primary-500/20' : 'bg-white/5 text-white/40'}`}>
-                                                        {s}
-                                                    </span>
-                                                ))}
-                                            </div>
+                                                {/* Description (expandable) */}
+                                                <AnimatePresence>
+                                                    {expandedJob === job.id && (
+                                                        <motion.p
+                                                            initial={{ opacity: 0, height: 0 }}
+                                                            animate={{ opacity: 1, height: 'auto' }}
+                                                            exit={{ opacity: 0, height: 0 }}
+                                                            className="text-white/50 text-sm mt-3 leading-relaxed"
+                                                        >
+                                                            {job.description}
+                                                        </motion.p>
+                                                    )}
+                                                </AnimatePresence>
 
-                                            {/* Description (expandable) */}
-                                            <AnimatePresence>
-                                                {expandedJob === job.id && (
-                                                    <motion.p
-                                                        initial={{ opacity: 0, height: 0 }}
-                                                        animate={{ opacity: 1, height: 'auto' }}
-                                                        exit={{ opacity: 0, height: 0 }}
-                                                        className="text-white/50 text-sm mt-3 leading-relaxed"
+                                                {/* Actions */}
+                                                <div className="flex items-center gap-3 mt-4">
+                                                    <a
+                                                        href={job.applyLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="btn-primary text-sm py-2 flex items-center gap-2 no-underline"
+                                                        id={`apply-btn-${job.id}`}
                                                     >
-                                                        {job.description}
-                                                    </motion.p>
-                                                )}
-                                            </AnimatePresence>
-
-                                            {/* Actions */}
-                                            <div className="flex items-center gap-3 mt-4">
-                                                <a
-                                                    href={job.applyLink}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="btn-primary text-sm py-2 flex items-center gap-2 no-underline"
-                                                    id={`apply-btn-${job.id}`}
-                                                >
-                                                    Apply Now <ArrowUpRight className="w-3.5 h-3.5" />
-                                                </a>
-                                                <button
-                                                    onClick={() => setExpandedJob(expandedJob === job.id ? null : job.id)}
-                                                    className="btn-ghost text-sm flex items-center gap-1"
-                                                >
-                                                    {expandedJob === job.id ? 'Less' : 'View Details'}
-                                                    <ChevronRight className={`w-4 h-4 transition-transform ${expandedJob === job.id ? 'rotate-90' : ''}`} />
-                                                </button>
+                                                        {job.isLive ? 'Apply Now' : `Search on ${job.source}`} <ArrowUpRight className="w-3.5 h-3.5" />
+                                                    </a>
+                                                    <button
+                                                        onClick={() => setExpandedJob(expandedJob === job.id ? null : job.id)}
+                                                        className="btn-ghost text-sm flex items-center gap-1"
+                                                    >
+                                                        {expandedJob === job.id ? 'Less' : 'View Details'}
+                                                        <ChevronRight className={`w-4 h-4 transition-transform ${expandedJob === job.id ? 'rotate-90' : ''}`} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            );
+                        })}
                     </AnimatePresence>
 
                     {filtered.length === 0 && (
@@ -520,7 +644,8 @@ export default function AgentDashboard() {
             {/* Last searched footer */}
             {lastSearched && jobs.length > 0 && (
                 <p className="text-white/30 text-xs text-center">
-                    Last updated: {formatDate(lastSearched)} · {jobs.length} jobs from {new Set(jobs.map(j => j.source)).size} sources
+                    Last updated: {formatDate(lastSearched)} · {jobs.length} jobs from {uniqueSources.length} platforms
+                    {liveJobs.length > 0 && ` · ${liveJobs.length} live results`}
                 </p>
             )}
         </div>

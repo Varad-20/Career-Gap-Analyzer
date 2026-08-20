@@ -20,8 +20,8 @@ import StudentQueries from './pages/student/StudentQueries';
 import PremiumSession from './pages/student/PremiumSession';
 import AgentDashboard from './pages/student/AgentDashboard';
 import SkillGapReport from './pages/student/SkillGapReport';
-
-
+import PlacementDrives from './pages/student/PlacementDrives';
+import MyDriveApplications from './pages/student/MyDriveApplications';
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -38,6 +38,15 @@ import InstructorCurriculum from './pages/instructor/InstructorCurriculum';
 import InstructorProfile from './pages/instructor/InstructorProfile';
 import InstructorStudents from './pages/instructor/InstructorStudents';
 import InstructorQueries from './pages/instructor/InstructorQueries';
+
+// Coordinator Portal
+import CoordinatorAuth from './pages/coordinator/CoordinatorAuth';
+import CoordinatorLayout from './pages/coordinator/CoordinatorLayout';
+import CoordinatorDashboard from './pages/coordinator/CoordinatorDashboard';
+import ManageDrives from './pages/coordinator/ManageDrives';
+import DriveApplicants from './pages/coordinator/DriveApplicants';
+import CollegeStudents from './pages/coordinator/CollegeStudents';
+import PlacementStats from './pages/coordinator/PlacementStats';
 
 // Layouts
 import StudentLayout from './components/layout/StudentLayout';
@@ -60,6 +69,13 @@ const ProtectedRoute = ({ children, role }: { children: ReactNode; role?: string
 
     if (!isAuthenticated) return <Navigate to="/login" replace />;
     if (role && user?.role !== role) return <Navigate to="/" replace />;
+    return <>{children}</>;
+};
+
+// Coordinator protected route (uses localStorage, not AuthContext)
+const CoordinatorRoute = ({ children }: { children: ReactNode }) => {
+    const token = localStorage.getItem('coordinatorToken');
+    if (!token) return <Navigate to="/coordinator" replace />;
     return <>{children}</>;
 };
 
@@ -86,6 +102,9 @@ function AppRoutes() {
                 <Route path="matches" element={<JobMatches />} />
                 <Route path="applications" element={<MyApplications />} />
                 <Route path="saved" element={<SavedJobs />} />
+                {/* ── Placement Drives ── */}
+                <Route path="drives" element={<PlacementDrives />} />
+                <Route path="my-drives" element={<MyDriveApplications />} />
                 {/* Skill Up Paths */}
                 <Route path="skill-up" element={<SkillUp />} />
                 <Route path="skill-up/:courseId" element={<CourseDashboard />} />
@@ -93,13 +112,27 @@ function AppRoutes() {
                 <Route path="premium" element={<PremiumSession />} />
             </Route>
 
-            {/* Instructor Portal — Public, separate auth */}
+            {/* Instructor Portal */}
             <Route path="/instructor" element={<InstructorAuth />} />
             <Route path="/instructor/dashboard" element={<InstructorDashboard />} />
             <Route path="/instructor/profile" element={<InstructorProfile />} />
             <Route path="/instructor/students" element={<InstructorStudents />} />
             <Route path="/instructor/queries" element={<InstructorQueries />} />
             <Route path="/instructor/courses/:courseId/curriculum" element={<InstructorCurriculum />} />
+
+            {/* Coordinator Portal */}
+            <Route path="/coordinator" element={<CoordinatorAuth />} />
+            <Route path="/coordinator" element={
+                <CoordinatorRoute>
+                    <CoordinatorLayout />
+                </CoordinatorRoute>
+            }>
+                <Route path="dashboard" element={<CoordinatorDashboard />} />
+                <Route path="drives" element={<ManageDrives />} />
+                <Route path="drives/:driveId" element={<DriveApplicants />} />
+                <Route path="students" element={<CollegeStudents />} />
+                <Route path="stats" element={<PlacementStats />} />
+            </Route>
 
             {/* Admin Management (Protected) */}
             <Route path="/admin" element={
@@ -116,7 +149,7 @@ function AppRoutes() {
                 <Route path="course-review" element={<AdminCourseReview />} />
             </Route>
 
-            {/* Final Catch-all Redirect */}
+            {/* Catch-all */}
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );
