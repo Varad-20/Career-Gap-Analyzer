@@ -66,51 +66,55 @@ export default function AdminCourseReview() {
         <div className="p-8 space-y-6 max-w-7xl mx-auto">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <BookOpen className="w-7 h-7 text-primary-400" /> Course & Instructor Management
+                <h1 className="text-2xl font-bold text-ivory-50 flex items-center gap-3">
+                    <BookOpen className="w-7 h-7 text-shade-blue-400" /> Course & Instructor Management
                 </h1>
-                <p className="text-white/50 mt-1">Grant instructors permission and approve their course submissions.</p>
+                <p className="text-ivory-400 mt-1 text-sm font-medium">Grant instructors permission and approve their course submissions.</p>
             </div>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Total Instructors', value: instructors.length, icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-                    { label: 'Awaiting Permission', value: pendingInstructors, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-                    { label: 'Verified Instructors', value: verifiedCount, icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-                    { label: 'Total Courses', value: courses.length, icon: BookOpen, color: 'text-primary-400', bg: 'bg-primary-500/10' },
+                    { label: 'Total Instructors', value: instructors.length, icon: Users, color: 'text-shade-blue-400', bg: 'bg-shade-blue-500/15 border-shade-blue-500/30' },
+                    { label: 'Awaiting Permission', value: pendingInstructors, icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/15 border-amber-500/30' },
+                    { label: 'Verified Instructors', value: verifiedCount, icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/15 border-emerald-500/30' },
+                    { label: 'Total Courses', value: courses.length, icon: BookOpen, color: 'text-shade-blue-400', bg: 'bg-shade-blue-500/15 border-shade-blue-500/30' },
                 ].map(c => (
-                    <div key={c.label} className="glass-card p-4 flex items-center gap-4">
-                        <div className={`p-3 ${c.bg} rounded-xl ${c.color}`}>
+                    <div key={c.label} className="glass-card p-4 flex items-center gap-4 border-ivory/10 shadow-xl">
+                        <div className={`p-3 ${c.bg} border rounded-xl ${c.color} shadow-inner`}>
                             <c.icon className="w-5 h-5" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-white">{c.value}</p>
-                            <p className="text-white/50 text-xs">{c.label}</p>
+                            <p className="text-2xl font-bold text-ivory-50">{c.value}</p>
+                            <p className="text-ivory-400 text-xs font-medium">{c.label}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
             {/* Main Tabs */}
-            <div className="flex gap-2 p-1 bg-white/5 rounded-xl w-fit">
+            <div className="flex gap-2 p-1 bg-ivory-100/5 border border-ivory/10 rounded-xl w-fit">
                 {([
-                    { key: 'instructors', label: '👤 Instructors', badge: pendingInstructors },
-                    { key: 'courses', label: '📚 Course Submissions' }
-                ] as const).map(t => (
-                    <button
-                        key={t.key}
-                        onClick={() => setMainTab(t.key as MainTab)}
-                        className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${mainTab === t.key ? 'bg-primary-600 text-white' : 'text-white/50 hover:text-white'}`}
-                    >
-                        {t.label}
-                        {'badge' in t && t.badge > 0 && (
-                            <span className="bg-yellow-500 text-dark-900 text-xs font-bold px-1.5 py-0.5 rounded-full">
-                                {t.badge}
-                            </span>
-                        )}
-                    </button>
-                ))}
+                    { key: 'instructors', label: 'Instructors', icon: Users, badge: pendingInstructors },
+                    { key: 'courses', label: 'Course Submissions', icon: BookOpen }
+                ] as const).map(t => {
+                    const TabIcon = t.icon;
+                    return (
+                        <button
+                            key={t.key}
+                            onClick={() => setMainTab(t.key as MainTab)}
+                            className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${mainTab === t.key ? 'btn-primary text-white' : 'text-ivory-400 hover:text-ivory-50'}`}
+                        >
+                            <TabIcon className="w-4 h-4" />
+                            {t.label}
+                            {'badge' in t && t.badge > 0 && (
+                                <span className="bg-amber-500 text-charcoal-950 text-xs font-bold px-1.5 py-0.5 rounded-full">
+                                    {t.badge}
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* ── INSTRUCTORS TAB ─────────────────────────────────────────────── */}

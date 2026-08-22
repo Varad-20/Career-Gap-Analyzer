@@ -19,7 +19,7 @@ const PLANS = [
         period: '/mo',
         desc: 'Perfect for quick skill-ups',
         features: ['All Premium Courses', 'AI Resume Scoring', 'Priority Instructor Chat'],
-        color: 'from-blue-500 to-indigo-600',
+        color: 'from-shade-blue-500 to-indigo-600',
         popular: false
     },
     {
@@ -29,7 +29,7 @@ const PLANS = [
         period: '/3mo',
         desc: 'Most popular for job seekers',
         features: ['All Premium Courses', 'Unlimited AI Analysis', 'Direct Chat Access', 'Job Match Priority'],
-        color: 'from-primary-500 to-purple-600',
+        color: 'from-shade-blue-600 to-purple-600',
         popular: true
     },
     {
@@ -56,7 +56,6 @@ export default function PremiumSession() {
         mutationFn: (planId: string) => skillAPI.upgradeSubscription({ planId }),
         onSuccess: async () => {
             try {
-                // Fetch fresh user data including subscription
                 const res = await authAPI.getMe();
                 updateUser(res.data.user);
 
@@ -78,18 +77,18 @@ export default function PremiumSession() {
 
     if (success) {
         return (
-            <div className="min-h-[80vh] flex flex-col items-center justify-center p-8 text-center">
+            <div className="min-h-[80vh] flex flex-col items-center justify-center p-8 text-center text-slate-900">
                 <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mb-8"
+                    className="w-24 h-24 bg-emerald-500/15 rounded-full flex items-center justify-center text-emerald-600 mb-8 border border-emerald-500/30 shadow-md"
                 >
                     <CheckCircle2 className="w-12 h-12" />
                 </motion.div>
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-4xl font-bold text-white mb-4"
+                    className="text-4xl font-bold text-slate-900 mb-4"
                 >
                     Upgrade Successful!
                 </motion.h1>
@@ -97,13 +96,13 @@ export default function PremiumSession() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="text-white/60 max-w-md mb-8"
+                    className="text-slate-600 max-w-md mb-8 text-sm font-semibold"
                 >
                     You are now a Premium member. All courses, AI features, and mentorship tools are unlocked for you.
                 </motion.p>
                 <button
                     onClick={() => navigate('/student/dashboard')}
-                    className="btn-primary"
+                    className="btn-primary shadow-lg shadow-shade-blue-500/25 py-3 px-8"
                 >
                     Go to Dashboard
                 </button>
@@ -112,30 +111,30 @@ export default function PremiumSession() {
     }
 
     return (
-        <div className="p-8 max-w-7xl mx-auto space-y-20 pb-24">
+        <div className="p-8 max-w-7xl mx-auto space-y-20 pb-24 text-slate-900">
             {/* Hero Section */}
             <section className="text-center space-y-6 relative py-10">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary-500/10 blur-[120px] rounded-full -z-10" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-shade-blue-500/10 blur-[120px] rounded-full -z-10" />
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-bold uppercase tracking-widest"
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-shade-blue-500/10 border border-shade-blue-500/25 text-shade-blue-700 text-xs font-bold uppercase tracking-widest"
                 >
-                    <Sparkles className="w-4 h-4" /> Go Premium
+                    <Sparkles className="w-4 h-4 text-shade-blue-600" /> Go Premium
                 </motion.div>
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="text-5xl md:text-6xl font-black text-white leading-tight"
+                    className="text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight"
                 >
-                    Unlock Your Career <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-500">Without Boundaries</span>
+                    Unlock Your Career <br /> <span className="text-shade-blue-600">Without Boundaries</span>
                 </motion.h1>
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-white/50 text-xl max-w-2xl mx-auto"
+                    className="text-slate-600 text-lg max-w-2xl mx-auto font-semibold"
                 >
                     Join 10,000+ students who accelerated their career with our AI-powered premium toolkit.
                 </motion.p>
@@ -153,13 +152,13 @@ export default function PremiumSession() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 + 0.3 }}
-                        className="glass-card p-8 group hover:border-primary-500/30 transition-all duration-500"
+                        className="glass-card p-8 group hover:border-shade-blue-500/40 transition-all duration-300 shadow-sm border-slate-200/80"
                     >
-                        <div className="w-14 h-14 bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-400 mb-6 group-hover:scale-110 group-hover:bg-primary-500/20 transition-all">
+                        <div className="w-14 h-14 bg-shade-blue-500/10 border border-shade-blue-500/25 rounded-2xl flex items-center justify-center text-shade-blue-600 mb-6 group-hover:scale-110 group-hover:bg-shade-blue-500/20 transition-all shadow-sm">
                             <item.icon className="w-7 h-7" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                        <p className="text-white/40 leading-relaxed font-medium">{item.desc}</p>
+                        <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                        <p className="text-slate-600 leading-relaxed font-medium text-sm">{item.desc}</p>
                     </motion.div>
                 ))}
             </section>
@@ -167,8 +166,8 @@ export default function PremiumSession() {
             {/* Pricing Cards */}
             <section className="space-y-12">
                 <div className="text-center">
-                    <h2 className="text-3xl font-bold text-white">Choose Your Plan</h2>
-                    <p className="text-white/40 mt-2">Transparent pricing. No hidden fees. Cancel anytime.</p>
+                    <h2 className="text-3xl font-bold text-slate-900">Choose Your Plan</h2>
+                    <p className="text-slate-600 mt-2 text-sm font-semibold">Transparent pricing. No hidden fees. Cancel anytime.</p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -178,28 +177,28 @@ export default function PremiumSession() {
                             initial={{ opacity: 0, x: i === 0 ? -20 : i === 2 ? 20 : 0, scale: plan.popular ? 1.05 : 1 }}
                             animate={{ opacity: 1, x: 0, scale: plan.popular ? 1.05 : 1 }}
                             transition={{ delay: 0.5 }}
-                            className={`glass-card p-8 flex flex-col relative ${plan.popular ? 'border-primary-500/50 shadow-[0_20px_50px_rgba(var(--primary-rgb),0.2)]' : ''}`}
+                            className={`glass-card p-8 flex flex-col relative shadow-md ${plan.popular ? 'border-shade-blue-500/50 shadow-shade-blue-500/15' : 'border-slate-200/80'}`}
                         >
                             {plan.popular && (
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-shade-blue-600 text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-md">
                                     Most Popular
                                 </div>
                             )}
 
                             <div className="mb-8">
-                                <h4 className="text-white/40 font-bold uppercase tracking-wider text-xs mb-1">{plan.name}</h4>
+                                <h4 className="text-slate-600 font-bold uppercase tracking-wider text-xs mb-1">{plan.name}</h4>
                                 <div className="flex items-end gap-1">
-                                    <span className="text-4xl font-black text-white">{plan.price}</span>
-                                    <span className="text-white/40 font-medium mb-1">{plan.period}</span>
+                                    <span className="text-4xl font-black text-slate-900">{plan.price}</span>
+                                    <span className="text-slate-600 font-bold mb-1">{plan.period}</span>
                                 </div>
-                                <p className="text-white/60 text-sm mt-3">{plan.desc}</p>
+                                <p className="text-slate-600 text-sm mt-3 font-semibold">{plan.desc}</p>
                             </div>
 
                             <ul className="space-y-4 mb-10 flex-1">
                                 {plan.features.map(feat => (
-                                    <li key={feat} className="flex items-start gap-3 text-sm text-white/80">
-                                        <div className="w-5 h-5 rounded-full bg-primary-500/10 flex items-center justify-center shrink-0">
-                                            <Check className="w-3 h-3 text-primary-400" />
+                                    <li key={feat} className="flex items-start gap-3 text-sm text-slate-800 font-semibold">
+                                        <div className="w-5 h-5 rounded-full bg-shade-blue-500/10 flex items-center justify-center shrink-0 border border-shade-blue-500/25">
+                                            <Check className="w-3 h-3 text-shade-blue-600" />
                                         </div>
                                         {feat}
                                     </li>
@@ -208,7 +207,7 @@ export default function PremiumSession() {
 
                             <button
                                 onClick={() => { setSelectedPlan(plan); setShowPayment(true); }}
-                                className={`w-full py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 group ${plan.popular ? 'btn-primary' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'}`}
+                                className={`w-full py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 group ${plan.popular ? 'btn-primary shadow-lg shadow-shade-blue-500/25' : 'btn-secondary'}`}
                             >
                                 Get Started <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </button>
@@ -220,63 +219,63 @@ export default function PremiumSession() {
             {/* Payment Modal */}
             <AnimatePresence>
                 {showPayment && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-900/80 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-dark-800 border border-white/10 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl"
+                            className="bg-white border border-slate-200/80 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl text-slate-900"
                         >
-                            <div className="p-8 border-b border-white/5 bg-gradient-to-br from-primary-500/10 to-transparent">
+                            <div className="p-8 border-b border-slate-200/80 bg-shade-blue-500/10">
                                 <div className="flex justify-between items-start mb-6">
                                     <div>
-                                        <p className="text-primary-400 font-bold text-xs uppercase tracking-widest mb-1">Upgrade Plan</p>
-                                        <h3 className="text-2xl font-bold text-white">{selectedPlan?.name} Access</h3>
+                                        <p className="text-shade-blue-700 font-bold text-xs uppercase tracking-widest mb-1">Upgrade Plan</p>
+                                        <h3 className="text-2xl font-bold text-slate-900">{selectedPlan?.name} Access</h3>
                                     </div>
-                                    <button onClick={() => setShowPayment(false)} className="text-white/30 hover:text-white transition-colors">&times;</button>
+                                    <button onClick={() => setShowPayment(false)} className="text-slate-500 hover:text-slate-900 text-xl font-bold transition-colors">&times;</button>
                                 </div>
-                                <div className="flex justify-between items-center bg-black/20 p-4 rounded-2xl border border-white/5">
-                                    <span className="text-white/60">Total Amount</span>
-                                    <span className="text-white font-black text-xl">{selectedPlan?.price}</span>
+                                <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                                    <span className="text-slate-600 text-sm font-bold">Total Amount</span>
+                                    <span className="text-slate-900 font-black text-xl">{selectedPlan?.price}</span>
                                 </div>
                             </div>
 
                             <div className="p-8 space-y-6">
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest px-1">Card Number</label>
+                                        <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest px-1">Card Number</label>
                                         <div className="relative">
-                                            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                             <input
                                                 type="text"
                                                 placeholder="XXXX XXXX XXXX XXXX"
                                                 value={cardDetails.number}
                                                 onChange={e => setCardDetails({ ...cardDetails, number: e.target.value })}
-                                                className="input-field w-full pl-12"
+                                                className="input-field w-full pl-12 font-medium"
                                             />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest px-1">Expiry</label>
+                                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest px-1">Expiry</label>
                                             <input
                                                 type="text"
                                                 placeholder="MM/YY"
                                                 value={cardDetails.expiry}
                                                 onChange={e => setCardDetails({ ...cardDetails, expiry: e.target.value })}
-                                                className="input-field w-full"
+                                                className="input-field w-full font-medium"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest px-1">CVC</label>
+                                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest px-1">CVC</label>
                                             <div className="relative">
-                                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                                 <input
                                                     type="password"
                                                     placeholder="***"
                                                     value={cardDetails.cvc}
                                                     onChange={e => setCardDetails({ ...cardDetails, cvc: e.target.value })}
-                                                    className="input-field w-full pl-12"
+                                                    className="input-field w-full pl-12 font-medium"
                                                 />
                                             </div>
                                         </div>
@@ -286,7 +285,7 @@ export default function PremiumSession() {
                                 <button
                                     onClick={() => upgradeMutation.mutate(selectedPlan.id)}
                                     disabled={upgradeMutation.isPending}
-                                    className="w-full py-4 bg-primary-500 text-white rounded-2xl font-bold shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)] hover:bg-primary-400 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    className="btn-primary w-full py-4 flex items-center justify-center gap-2 shadow-lg shadow-shade-blue-500/25 text-base font-bold"
                                 >
                                     {upgradeMutation.isPending ? 'Processing...' : (
                                         <>
@@ -294,8 +293,8 @@ export default function PremiumSession() {
                                         </>
                                     )}
                                 </button>
-                                <p className="text-[10px] text-white/30 text-center uppercase tracking-widest flex items-center justify-center gap-2">
-                                    <Lock className="w-3 h-3" /> Secure 256-bit encrypted payment
+                                <p className="text-[10px] text-slate-500 text-center uppercase tracking-widest flex items-center justify-center gap-2 font-bold">
+                                    <Lock className="w-3 h-3 text-shade-blue-600" /> Secure 256-bit encrypted payment
                                 </p>
                             </div>
                         </motion.div>

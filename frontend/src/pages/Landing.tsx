@@ -23,55 +23,56 @@ const stats = [
 
 export default function Landing() {
     return (
-        <div className="min-h-screen bg-hero-gradient text-white">
+        <div className="min-h-screen bg-[#faf8f5] text-[#0b0d11] relative overflow-hidden">
+            {/* Ambient liquid backdrop orbs */}
+            <div className="liquid-orb-blue top-10 left-1/4" />
+            <div className="liquid-orb-red top-60 right-1/4" />
+            <div className="liquid-orb-ivory bottom-40 left-1/3" />
+
             {/* Navbar */}
-            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 backdrop-blur-md bg-dark-900/50 border-b border-white/5">
+            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 backdrop-blur-2xl bg-[#fffdfa]/85 border-b border-[#eae6dc] shadow-sm">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-button-gradient flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-shade-blue-600 to-shade-blue-700 flex items-center justify-center shadow-md shadow-shade-blue-500/20 border border-white/40">
                             <Sparkles className="w-5 h-5 text-white" />
                         </div>
-                        <span className="font-bold text-lg">Career Gap Finder</span>
+                        <span className="font-bold text-lg tracking-wide text-[#0b0d11]">Career Gap Finder</span>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link to="/instructor" className="btn-ghost text-sm flex items-center gap-1.5 text-yellow-400 hover:text-yellow-300">
+                        <Link to="/instructor" className="btn-ghost text-sm flex items-center gap-1.5 text-shade-blue-600 hover:text-shade-blue-700 font-semibold">
                             <BookOpen className="w-4 h-4" /> Teach on Platform
                         </Link>
-                        <Link to="/login" className="btn-ghost text-sm">Sign In</Link>
-                        <Link to="/register" className="btn-primary text-sm py-2 px-5">Get Started Free</Link>
+                        <Link to="/login" className="btn-ghost text-sm text-[#4a5568] hover:text-[#0b0d11] font-medium">Sign In</Link>
+                        <Link to="/register" className="btn-primary text-sm py-2 px-5 shadow-lg shadow-shade-blue-500/25">Get Started Free</Link>
                     </div>
                 </div>
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-                {/* Background orbs */}
-                <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute top-40 right-1/4 w-80 h-80 bg-accent-600/20 rounded-full blur-3xl pointer-events-none" />
-
+            <section className="pt-36 pb-20 px-6 relative z-10">
                 <div className="max-w-5xl mx-auto text-center relative">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm mb-8">
-                            <Sparkles className="w-4 h-4" />
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-shade-blue-500/10 border border-shade-blue-500/25 text-shade-blue-700 text-sm mb-8 backdrop-blur-xl shadow-sm font-semibold">
+                            <Sparkles className="w-4 h-4 text-shade-blue-600" />
                             <span>AI-Powered Career Gap Solution</span>
                         </div>
 
-                        <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6">
+                        <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight text-[#0b0d11]">
                             Your Career Gap{' '}
                             <span className="gradient-text">Is Not a Deal-Breaker</span>
                         </h1>
 
-                        <p className="text-xl text-white/60 max-w-3xl mx-auto mb-10">
-                            We connect students and gap professionals with companies that actually want to hire them.
+                        <p className="text-xl text-[#4a5568] max-w-3xl mx-auto mb-10 leading-relaxed font-normal">
+                            We connect students and gap professionals with companies that actively welcome them.
                             Upload your resume, get AI analysis, and find your perfect match in minutes.
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Link to="/register" className="btn-primary inline-flex items-center gap-2 text-base px-8 py-4">
+                            <Link to="/register" className="btn-primary inline-flex items-center gap-2 text-base px-8 py-4 shadow-xl shadow-shade-blue-500/25">
                                 Start Your Job Search
                                 <ArrowRight className="w-5 h-5" />
                             </Link>
@@ -83,22 +84,24 @@ export default function Landing() {
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.3 }}
-                        className="mt-16 glass-card p-6 max-w-2xl mx-auto"
+                        className="mt-16 glass-card p-6 max-w-2xl mx-auto text-left shadow-lg relative overflow-hidden"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <p className="text-white/60 text-sm">AI Resume Analysis</p>
-                            <span className="badge-green">Analyzing...</span>
+                            <p className="text-[#181d27] text-sm font-semibold flex items-center gap-2">
+                                <Brain className="w-4 h-4 text-shade-blue-600" /> AI Resume Analysis
+                            </p>
+                            <span className="badge-blue">Analyzing...</span>
                         </div>
                         <div className="space-y-3">
                             {[
-                                { label: 'Resume Score', value: 82, color: 'from-primary-500 to-accent-500' },
-                                { label: 'Skill Match', value: 76, color: 'from-emerald-500 to-teal-500' },
-                                { label: 'Gap Impact', value: 35, color: 'from-yellow-500 to-orange-500' },
+                                { label: 'Resume Score', value: 82, color: 'from-shade-blue-600 to-shade-blue-500' },
+                                { label: 'Skill Match', value: 76, color: 'from-emerald-600 to-teal-500' },
+                                { label: 'Gap Impact', value: 35, color: 'from-shade-red-600 to-shade-red-500' },
                             ].map(({ label, value, color }) => (
                                 <div key={label}>
                                     <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-white/60">{label}</span>
-                                        <span className="text-white font-medium">{value}%</span>
+                                        <span className="text-[#4a5568] font-medium">{label}</span>
+                                        <span className="text-[#0b0d11] font-bold">{value}%</span>
                                     </div>
                                     <div className="progress-bar">
                                         <motion.div
@@ -111,7 +114,7 @@ export default function Landing() {
                                 </div>
                             ))}
                         </div>
-                        <div className="mt-4 pt-4 border-t border-white/5 flex gap-2 flex-wrap">
+                        <div className="mt-5 pt-4 border-t border-[#eae6dc] flex gap-2 flex-wrap">
                             {['React', 'Python', 'Machine Learning', 'Node.js', 'SQL'].map(s => (
                                 <span key={s} className="badge-blue">{s}</span>
                             ))}
@@ -121,7 +124,7 @@ export default function Landing() {
             </section>
 
             {/* Stats */}
-            <section className="py-16 px-6 border-y border-white/5 bg-dark-800/50">
+            <section className="py-16 px-6 border-y border-[#eae6dc] bg-[#fffdfa]/75 backdrop-blur-xl relative z-10">
                 <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
                     {stats.map(({ label, value }, i) => (
                         <motion.div
@@ -131,19 +134,19 @@ export default function Landing() {
                             transition={{ delay: i * 0.1 }}
                             className="text-center"
                         >
-                            <p className="text-4xl font-black gradient-text mb-2">{value}</p>
-                            <p className="text-white/50 text-sm">{label}</p>
+                            <p className="text-4xl font-black gradient-text mb-2 tracking-tight">{value}</p>
+                            <p className="text-[#4a5568] text-sm font-semibold">{label}</p>
                         </motion.div>
                     ))}
                 </div>
             </section>
 
             {/* Features */}
-            <section className="py-24 px-6">
+            <section className="py-24 px-6 relative z-10">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold mb-4">Everything You Need to <span className="gradient-text">Get Hired</span></h2>
-                        <p className="text-white/50 text-lg">A complete platform built specifically for gap candidates</p>
+                        <h2 className="text-4xl font-bold mb-4 text-[#0b0d11]">Everything You Need to <span className="gradient-text">Get Hired</span></h2>
+                        <p className="text-[#4a5568] text-lg font-medium">A complete platform built specifically for career gap candidates</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -155,11 +158,11 @@ export default function Landing() {
                                 transition={{ delay: i * 0.1 }}
                                 className="glass-card-hover p-6 group"
                             >
-                                <div className="w-12 h-12 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-4 group-hover:bg-primary-500/20 transition-colors">
-                                    <Icon className="w-6 h-6 text-primary-400" />
+                                <div className="w-12 h-12 rounded-xl bg-shade-blue-500/10 border border-shade-blue-500/20 flex items-center justify-center mb-4 group-hover:bg-shade-blue-500/20 transition-colors shadow-sm">
+                                    <Icon className="w-6 h-6 text-shade-blue-600" />
                                 </div>
-                                <h3 className="text-white font-semibold mb-2">{title}</h3>
-                                <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
+                                <h3 className="text-[#0b0d11] font-bold text-lg mb-2">{title}</h3>
+                                <p className="text-[#4a5568] text-sm leading-relaxed">{desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -167,26 +170,26 @@ export default function Landing() {
             </section>
 
             {/* Instructor CTA Section */}
-            <section className="py-20 px-6 bg-dark-800/30">
+            <section className="py-20 px-6 bg-[#f5f2eb]/70 relative z-10">
                 <div className="max-w-6xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="rounded-3xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-orange-500/5 p-10 flex flex-col md:flex-row items-center justify-between gap-8"
+                        className="glass-card p-10 flex flex-col md:flex-row items-center justify-between gap-8 border-shade-blue-500/25 shadow-lg relative overflow-hidden"
                     >
-                        <div className="flex items-start gap-6">
-                            <div className="w-16 h-16 rounded-2xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-                                <BookOpen className="w-8 h-8 text-yellow-400" />
+                        <div className="flex items-start gap-6 relative z-10">
+                            <div className="w-16 h-16 rounded-2xl bg-shade-blue-500/10 border border-shade-blue-500/25 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <BookOpen className="w-8 h-8 text-shade-blue-600" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-white mb-2">Are You an Expert? <span className="text-yellow-400">Teach on Our Platform</span></h2>
-                                <p className="text-white/60 max-w-lg">
-                                    Share your knowledge with thousands of career-seekers. Upload courses, earn revenue, and help people land their dream jobs. Admin-reviewed for quality.
+                                <h2 className="text-2xl font-bold text-[#0b0d11] mb-2">Are You an Expert? <span className="text-shade-blue-600">Teach on Our Platform</span></h2>
+                                <p className="text-[#4a5568] max-w-lg leading-relaxed text-sm">
+                                    Share your knowledge with thousands of career-seekers. Upload courses, earn revenue, and help people land their dream jobs.
                                 </p>
                                 <div className="flex flex-wrap gap-4 mt-4">
                                     {[{ icon: DollarSign, text: 'Earn per enrollment' }, { icon: Users, text: 'Reach 12K+ learners' }, { icon: CheckCircle, text: 'Admin quality seal' }].map(({ icon: Icon, text }) => (
-                                        <span key={text} className="flex items-center gap-1.5 text-sm text-white/60">
-                                            <Icon className="w-4 h-4 text-yellow-400" /> {text}
+                                        <span key={text} className="flex items-center gap-1.5 text-xs text-[#4a5568] font-semibold">
+                                            <Icon className="w-4 h-4 text-shade-blue-600" /> {text}
                                         </span>
                                     ))}
                                 </div>
@@ -194,7 +197,7 @@ export default function Landing() {
                         </div>
                         <Link
                             to="/instructor"
-                            className="flex-shrink-0 flex items-center gap-2 px-8 py-4 rounded-2xl bg-yellow-500 hover:bg-yellow-400 text-dark-900 font-bold transition-colors text-base"
+                            className="flex-shrink-0 flex items-center gap-2 px-8 py-4 rounded-2xl btn-primary text-white font-bold transition-all text-base shadow-xl shadow-shade-blue-500/25"
                         >
                             Start Teaching <ChevronRight className="w-5 h-5" />
                         </Link>
@@ -203,14 +206,13 @@ export default function Landing() {
             </section>
 
             {/* CTA */}
-            <section className="py-24 px-6 text-center">
-                <div className="max-w-3xl mx-auto glass-card p-12 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-button-gradient opacity-5 pointer-events-none" />
+            <section className="py-24 px-6 text-center relative z-10">
+                <div className="max-w-3xl mx-auto glass-card p-12 relative overflow-hidden shadow-lg">
                     <div className="relative z-10">
-                        <Sparkles className="w-12 h-12 text-primary-400 mx-auto mb-6" />
-                        <h2 className="text-4xl font-bold mb-4">Ready to Find Your Job?</h2>
-                        <p className="text-white/60 mb-8">Join thousands of gap candidates who found their dream jobs through our platform.</p>
-                        <Link to="/register" className="btn-primary inline-flex items-center gap-2 text-base px-10 py-4">
+                        <Sparkles className="w-12 h-12 text-shade-blue-600 mx-auto mb-6" />
+                        <h2 className="text-4xl font-bold mb-4 text-[#0b0d11]">Ready to Find Your Job?</h2>
+                        <p className="text-[#4a5568] mb-8 max-w-xl mx-auto font-medium">Join thousands of gap candidates who found their dream jobs through our platform.</p>
+                        <Link to="/register" className="btn-primary inline-flex items-center gap-2 text-base px-10 py-4 shadow-xl shadow-shade-blue-500/25">
                             Create Free Account
                             <ArrowRight className="w-5 h-5" />
                         </Link>
@@ -219,9 +221,9 @@ export default function Landing() {
             </section>
 
             {/* Footer */}
-            <footer className="py-8 px-6 border-t border-white/5 text-center text-white/30 text-sm">
-                <p>© 2024 Career Gap Job Finder. Built with ❤️ for gap professionals.</p>
+            <footer className="py-8 px-6 border-t border-[#eae6dc] text-center text-[#6c788d] text-sm relative z-10">
+                <p>© 2026 Career Gap Job Finder. Built for gap professionals.</p>
             </footer>
-        </div >
+        </div>
     );
 }

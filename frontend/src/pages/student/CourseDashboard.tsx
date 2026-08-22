@@ -28,17 +28,17 @@ export default function CourseDashboard() {
     if (isLoading) {
         return (
             <div className="p-8 flex items-center justify-center min-h-[50vh]">
-                <div className="w-12 h-12 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-shade-blue-500/30 border-t-shade-blue-500 rounded-full animate-spin" />
             </div>
         );
     }
 
     if (isError || !course) {
         return (
-            <div className="p-8 text-center text-white/50 min-h-screen">
+            <div className="p-8 text-center text-ivory-400 min-h-screen">
                 Failed to load course details. Ensure you have the required subscription.
                 <br />
-                <button onClick={() => navigate('/student/skill-up')} className="text-primary-400 mt-4 hover:underline">
+                <button onClick={() => navigate('/student/skill-up')} className="text-shade-blue-400 mt-4 hover:underline">
                     &larr; Return to Library
                 </button>
             </div>
@@ -70,7 +70,7 @@ export default function CourseDashboard() {
         <div className="p-8 space-y-6 max-w-7xl mx-auto pb-24">
             <button
                 onClick={() => navigate('/student/skill-up')}
-                className="flex items-center text-white/50 hover:text-white transition-colors mb-4"
+                className="flex items-center text-ivory-400 hover:text-ivory-50 transition-colors mb-4 text-sm font-medium"
             >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Library
             </button>
@@ -82,7 +82,7 @@ export default function CourseDashboard() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="mb-8 rounded-3xl overflow-hidden bg-black aspect-video relative flex items-center justify-center border border-white/5 shadow-2xl"
+                        className="mb-8 rounded-3xl overflow-hidden bg-charcoal-950 aspect-video relative flex items-center justify-center border border-ivory/10 shadow-2xl"
                     >
                         {selectedLesson.videoUrl ? (
                             <iframe
@@ -95,14 +95,14 @@ export default function CourseDashboard() {
                             ></iframe>
                         ) : (
                             <div className="text-center p-12">
-                                <Video className="w-16 h-16 text-white/20 mx-auto mb-4" />
-                                <p className="text-white font-bold text-xl mb-2">{selectedLesson.title}</p>
-                                <p className="text-white/50 max-w-md mx-auto">{selectedLesson.content || 'This lesson has reading material but no video lecture.'}</p>
+                                <Video className="w-16 h-16 text-ivory-400/30 mx-auto mb-4" />
+                                <p className="text-ivory-50 font-bold text-xl mb-2">{selectedLesson.title}</p>
+                                <p className="text-ivory-400 max-w-md mx-auto text-sm">{selectedLesson.content || 'This lesson has reading material but no video lecture.'}</p>
                             </div>
                         )}
                         <button
                             onClick={() => setSelectedLesson(null)}
-                            className="absolute top-6 right-6 bg-dark-900/80 backdrop-blur-md text-white/80 hover:text-white px-4 py-2 rounded-xl border border-white/10"
+                            className="absolute top-6 right-6 bg-charcoal-900/90 backdrop-blur-md text-ivory-50 hover:text-white px-4 py-2 rounded-xl border border-ivory/10 text-sm font-bold"
                         >
                             &times; Close Player
                         </button>
@@ -110,19 +110,19 @@ export default function CourseDashboard() {
                 )}
             </AnimatePresence>
 
-            <div className="bg-gradient-to-r from-dark-800 to-dark-900 border border-white/5 p-8 rounded-3xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="glass-card border border-ivory/10 p-8 rounded-3xl relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-shade-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <span className="text-xs font-bold text-primary-400 bg-primary-500/10 px-3 py-1 rounded-full uppercase tracking-wider">{course.category}</span>
-                        <h1 className="text-3xl font-bold text-white mt-3 mb-2">{course.title}</h1>
-                        <p className="text-white/60 max-w-2xl">{course.description}</p>
+                        <span className="text-xs font-bold text-shade-blue-400 bg-shade-blue-500/15 border border-shade-blue-500/30 px-3 py-1 rounded-full uppercase tracking-wider">{course.category}</span>
+                        <h1 className="text-3xl font-bold text-ivory-50 mt-3 mb-2 tracking-tight">{course.title}</h1>
+                        <p className="text-ivory-400 max-w-2xl text-sm font-medium">{course.description}</p>
                     </div>
                     <button
                         onClick={() => setShowQueryModal(true)}
-                        className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-semibold transition-all hover:scale-105 active:scale-95 group"
+                        className="btn-primary flex items-center gap-2 shadow-xl shadow-shade-blue-500/25"
                     >
-                        <MessageSquare className="w-5 h-5 text-primary-400 group-hover:rotate-12 transition-transform" />
+                        <MessageSquare className="w-4 h-4" />
                         Ask Instructor
                     </button>
                 </div>
@@ -130,22 +130,22 @@ export default function CourseDashboard() {
 
             <div className="grid lg:grid-cols-3 gap-8 pt-4">
                 <div className="lg:col-span-2 space-y-4">
-                    <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-2">
-                        <Layout className="w-5 h-5 text-primary-400" /> Curriculum ( {totalLessons} Lessons )
+                    <h2 className="text-xl font-bold text-ivory-50 flex items-center gap-2 mb-2">
+                        <Layout className="w-5 h-5 text-shade-blue-400" /> Curriculum ( {totalLessons} Lessons )
                     </h2>
 
                     <div className="space-y-3">
                         {course.modules?.map((module, mIdx) => (
-                            <div key={mIdx} className="glass-card overflow-hidden">
+                            <div key={mIdx} className="glass-card overflow-hidden border-ivory/10 shadow-xl">
                                 <button
                                     onClick={() => setExpandedModule(expandedModule === mIdx ? null : mIdx)}
-                                    className="w-full p-5 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                                    className="w-full p-5 flex items-center justify-between text-left hover:bg-ivory-100/5 transition-colors"
                                 >
-                                    <h3 className="text-white font-semibold flex items-center gap-3">
-                                        <div className="text-xs font-bold text-white/30 w-5">{(mIdx + 1).toString().padStart(2, '0')}</div>
+                                    <h3 className="text-ivory-50 font-semibold flex items-center gap-3">
+                                        <div className="text-xs font-bold text-ivory-400/40 w-5">{(mIdx + 1).toString().padStart(2, '0')}</div>
                                         {module.title}
                                     </h3>
-                                    {expandedModule === mIdx ? <ChevronDown className="w-4 h-4 text-white/30" /> : <ChevronRight className="w-4 h-4 text-white/30" />}
+                                    {expandedModule === mIdx ? <ChevronDown className="w-4 h-4 text-ivory-400" /> : <ChevronRight className="w-4 h-4 text-ivory-400" />}
                                 </button>
 
                                 <AnimatePresence>
@@ -154,25 +154,25 @@ export default function CourseDashboard() {
                                             initial={{ height: 0, opacity: 0 }}
                                             animate={{ height: 'auto', opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
-                                            className="border-t border-white/5 bg-dark-800/20"
+                                            className="border-t border-ivory/10 bg-charcoal-950/40"
                                         >
                                             <div className="p-2 space-y-1">
                                                 {module.lessons?.map((lesson, lIdx) => (
                                                     <button
                                                         key={lIdx}
                                                         onClick={() => setSelectedLesson(lesson)}
-                                                        className={`w-full flex items-center justify-between p-4 rounded-xl transition-all group ${selectedLesson?.title === lesson.title ? 'bg-primary-500/10 text-primary-400' : 'hover:bg-white/5 text-white/60 hover:text-white'}`}
+                                                        className={`w-full flex items-center justify-between p-4 rounded-xl transition-all group ${selectedLesson?.title === lesson.title ? 'bg-shade-blue-500/15 border border-shade-blue-500/30 text-shade-blue-300' : 'hover:bg-ivory-100/5 text-ivory-400 hover:text-ivory-50'}`}
                                                     >
                                                         <div className="flex items-center gap-4 text-left">
-                                                            <div className={`p-1.5 rounded-lg ${selectedLesson?.title === lesson.title ? 'bg-primary-500 text-dark-900' : 'bg-white/5 text-white/30 group-hover:text-primary-400 group-hover:bg-primary-500/10'}`}>
+                                                            <div className={`p-1.5 rounded-lg ${selectedLesson?.title === lesson.title ? 'bg-shade-blue-500 text-white' : 'bg-ivory-100/10 text-ivory-400 group-hover:text-shade-blue-400 group-hover:bg-shade-blue-500/15'}`}>
                                                                 <Play className="w-3 h-3 fill-current" />
                                                             </div>
                                                             <div>
                                                                 <p className="text-sm font-medium">{lesson.title}</p>
-                                                                <p className="text-[10px] opacity-50">{lesson.duration}</p>
+                                                                <p className="text-[10px] opacity-50 font-bold">{lesson.duration}</p>
                                                             </div>
                                                         </div>
-                                                        {lesson.isCompleted ? <CheckCircle className="w-4 h-4 text-emerald-400" /> : <ChevronRight className="w-3.5 h-3.5 opacity-20" />}
+                                                        {lesson.isCompleted ? <CheckCircle className="w-4 h-4 text-emerald-400" /> : <ChevronRight className="w-3.5 h-3.5 opacity-30" />}
                                                     </button>
                                                 ))}
                                             </div>
@@ -185,41 +185,41 @@ export default function CourseDashboard() {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="glass-card p-6 space-y-4">
-                        <h3 className="text-lg font-bold text-white mb-2">Learning Assets</h3>
+                    <div className="glass-card p-6 space-y-4 border-ivory/10 shadow-xl">
+                        <h3 className="text-lg font-bold text-ivory-50 mb-2">Learning Assets</h3>
 
                         {course.resources?.length > 0 ? course.resources.map((res, i) => (
-                            <button key={i} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10 text-left">
+                            <button key={i} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-ivory-100/5 transition-colors border border-transparent hover:border-ivory/10 text-left">
                                 <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg bg-white/5 ${res.type === 'PDF' ? 'text-emerald-400' : 'text-blue-400'}`}>
+                                    <div className={`p-2 rounded-lg bg-ivory-100/10 ${res.type === 'PDF' ? 'text-emerald-400' : 'text-shade-blue-400'}`}>
                                         <FileText className="w-4 h-4" />
                                     </div>
                                     <div className="text-left">
-                                        <p className="text-white text-sm font-medium">{res.title}</p>
-                                        <p className="text-white/40 text-[10px] font-bold uppercase">{res.type}</p>
+                                        <p className="text-ivory-50 text-sm font-medium">{res.title}</p>
+                                        <p className="text-ivory-400 text-[10px] font-bold uppercase">{res.type}</p>
                                     </div>
                                 </div>
-                                <Download className="w-4 h-4 text-white/40" />
+                                <Download className="w-4 h-4 text-ivory-400" />
                             </button>
                         )) : (
-                            <p className="text-white/30 text-xs py-4 text-center">No additional materials for this course yet.</p>
+                            <p className="text-ivory-400/50 text-xs py-4 text-center">No additional materials for this course yet.</p>
                         )}
 
                         {course.mockTests?.length > 0 && (
-                            <div className="pt-4 border-t border-white/5">
-                                <h4 className="text-sm font-bold text-white mb-3">Mock Assessments</h4>
+                            <div className="pt-4 border-t border-ivory/10">
+                                <h4 className="text-sm font-bold text-ivory-50 mb-3">Mock Assessments</h4>
                                 {course.mockTests.map((test, i) => (
-                                    <button key={i} className="w-full flex items-center justify-between p-3 rounded-xl bg-primary-500/5 hover:bg-primary-500/10 transition-colors border border-primary-500/20 text-left group">
+                                    <button key={i} className="w-full flex items-center justify-between p-3 rounded-xl bg-shade-blue-500/10 hover:bg-shade-blue-500/20 transition-colors border border-shade-blue-500/20 text-left group">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-primary-500/10 text-primary-400">
+                                            <div className="p-2 rounded-lg bg-shade-blue-500/15 text-shade-blue-400">
                                                 <Lock className="w-4 h-4" />
                                             </div>
                                             <div>
-                                                <p className="text-white text-sm font-medium">{test.title}</p>
-                                                <p className="text-primary-400 text-[10px] font-bold uppercase">{test.duration} MINS</p>
+                                                <p className="text-ivory-50 text-sm font-medium">{test.title}</p>
+                                                <p className="text-shade-blue-400 text-[10px] font-bold uppercase">{test.duration} MINS</p>
                                             </div>
                                         </div>
-                                        <ChevronRight className="w-4 h-4 text-primary-400 group-hover:translate-x-1 transition-transform" />
+                                        <ChevronRight className="w-4 h-4 text-shade-blue-400 group-hover:translate-x-1 transition-transform" />
                                     </button>
                                 ))}
                             </div>
@@ -235,27 +235,27 @@ export default function CourseDashboard() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-dark-900/80 backdrop-blur-sm flex items-center justify-center p-4"
+                        className="fixed inset-0 z-50 bg-charcoal-950/80 backdrop-blur-md flex items-center justify-center p-4"
                     >
                         <motion.div
                             initial={{ scale: 0.95, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.95 }}
-                            className="bg-dark-800 border border-white/10 rounded-3xl w-full max-w-lg p-8 shadow-2xl"
+                            className="bg-charcoal-900 border border-ivory/10 rounded-3xl w-full max-w-lg p-8 shadow-2xl"
                         >
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold text-white flex items-center gap-3">
-                                    <MessageSquare className="w-6 h-6 text-primary-400" />
+                                <h3 className="text-xl font-bold text-ivory-50 flex items-center gap-3">
+                                    <MessageSquare className="w-6 h-6 text-shade-blue-400" />
                                     Ask the Instructor
                                 </h3>
-                                <button onClick={() => setShowQueryModal(false)} className="p-2 hover:bg-white/5 rounded-full text-white/50">
+                                <button onClick={() => setShowQueryModal(false)} className="p-2 hover:bg-ivory-100/10 rounded-full text-ivory-400">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
 
                             <form onSubmit={handleSendQuery} className="space-y-4">
                                 <div>
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1.5 block">Subject</label>
+                                    <label className="text-xs font-bold text-ivory-400 uppercase tracking-widest mb-1.5 block">Subject</label>
                                     <input
                                         type="text"
                                         placeholder="Brief topic of your doubt..."
@@ -266,7 +266,7 @@ export default function CourseDashboard() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1.5 block">Message</label>
+                                    <label className="text-xs font-bold text-ivory-400 uppercase tracking-widest mb-1.5 block">Message</label>
                                     <textarea
                                         placeholder="Details of what you'd like to ask..."
                                         required
@@ -287,7 +287,7 @@ export default function CourseDashboard() {
                                         </>
                                     )}
                                 </button>
-                                <p className="text-[10px] text-white/30 text-center uppercase tracking-widest mt-4">
+                                <p className="text-[10px] text-ivory-400/50 text-center uppercase tracking-widest mt-4">
                                     Instructor will be notified and will reply shortly.
                                 </p>
                             </form>

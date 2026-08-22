@@ -14,8 +14,15 @@ const navItems = [
 
 export default function CoordinatorLayout() {
     const navigate = useNavigate();
-    const raw = localStorage.getItem('coordinatorUser');
-    const user = raw ? JSON.parse(raw) : null;
+    let user: any = null;
+    try {
+        const raw = localStorage.getItem('coordinatorUser');
+        if (raw && raw !== 'undefined') {
+            user = JSON.parse(raw);
+        }
+    } catch {
+        user = null;
+    }
 
     const handleLogout = () => {
         localStorage.removeItem('coordinatorToken');

@@ -20,14 +20,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        try {
+            const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
 
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+            if (storedToken && storedUser && storedUser !== 'undefined') {
+                setToken(storedToken);
+                setUser(JSON.parse(storedUser));
+            }
+        } catch (err) {
+            console.error('Failed to parse auth user from localStorage:', err);
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }, []);
 
     const login = (newToken: string, newUser: User) => {

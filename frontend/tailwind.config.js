@@ -7,47 +7,94 @@ export default {
     theme: {
         extend: {
             colors: {
+                // Rich Warm Ivory Base Colors
+                ivory: {
+                    50: '#0b0d11',    // Highest contrast text (deep charcoal)
+                    100: '#181d27',   // Primary text
+                    200: '#2d3545',   // Secondary text
+                    300: '#4a5568',   // Muted body text
+                    400: '#6c788d',   // Subtitle text
+                    500: '#94a0b4',   // Border/placeholder
+                    600: '#eae6dc',   // Warm Ivory border
+                    700: '#f5f2eb',   // Warm Ivory card background
+                    800: '#faf8f5',   // Warm Ivory page background
+                    900: '#fffdfa',   // Pure Ivory card element
+                },
+                // Charcoal Dark Contrast Accent Colors
+                charcoal: {
+                    950: '#faf8f5',   // Warm Ivory page background
+                    900: '#fffdfa',   // Warm Ivory card background
+                    800: '#f5f2eb',   // Secondary Ivory fill
+                    700: '#eae6dc',   // Input border/fill
+                    600: '#dcd6c8',   // Border
+                    500: '#4a5568',   // Label
+                    400: '#2d3545',   // Muted text
+                    300: '#181d27',   // Body text
+                    50: '#0b0d11',    // Title text
+                },
+                // Muted Shade Blue Accent
+                'shade-blue': {
+                    400: '#3b82f6',
+                    500: '#2563eb',
+                    600: '#1d4ed8',
+                    700: '#1e40af',
+                    900: '#1e3a8a',
+                },
+                // Muted Shade Red Accent
+                'shade-red': {
+                    400: '#ef4444',
+                    500: '#dc2626',
+                    600: '#b91c1c',
+                    700: '#991b1b',
+                    900: '#7f1d1d',
+                },
+                // Legacy compatibility mappings
                 primary: {
-                    50: '#eef2ff',
-                    100: '#e0e7ff',
-                    200: '#c7d2fe',
-                    300: '#a5b4fc',
-                    400: '#818cf8',
-                    500: '#6366f1',
-                    600: '#4f46e5',
-                    700: '#4338ca',
-                    800: '#3730a3',
-                    900: '#312e81',
+                    50: '#eff6ff',
+                    100: '#dbeafe',
+                    200: '#bfdbfe',
+                    300: '#93c5fd',
+                    400: '#3b82f6',
+                    500: '#2563eb',
+                    600: '#1d4ed8',
+                    700: '#1e40af',
+                    800: '#1e3a8a',
+                    900: '#172554',
                 },
                 accent: {
-                    400: '#c084fc',
-                    500: '#a855f7',
-                    600: '#9333ea',
+                    400: '#ef4444',
+                    500: '#dc2626',
+                    600: '#b91c1c',
                 },
                 dark: {
-                    900: '#0a0a1a',
-                    800: '#0f0f2d',
-                    700: '#1a1a3e',
-                    600: '#252550',
-                    500: '#2d2d70',
+                    900: '#fffdfa',
+                    800: '#faf8f5',
+                    700: '#f5f2eb',
+                    600: '#eae6dc',
+                    500: '#dcd6c8',
                 }
             },
             fontFamily: {
                 sans: ['Inter', 'system-ui', 'sans-serif'],
             },
             backgroundImage: {
-                'hero-gradient': 'linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0f0f2d 100%)',
-                'card-gradient': 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(168,85,247,0.1) 100%)',
-                'button-gradient': 'linear-gradient(135deg, #6366f1 0%, #9333ea 100%)',
+                'hero-gradient': 'radial-gradient(ellipse at 50% -20%, #f5f2eb 0%, #faf8f5 80%)',
+                'card-gradient': 'linear-gradient(135deg, rgba(255, 253, 250, 0.9) 0%, rgba(245, 242, 235, 0.7) 100%)',
+                'liquid-blue': 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(37, 99, 235, 0.05) 100%)',
+                'liquid-red': 'linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(220, 38, 38, 0.05) 100%)',
+                'liquid-ivory': 'linear-gradient(135deg, rgba(250, 248, 245, 0.7) 0%, rgba(245, 242, 235, 0.5) 100%)',
+                'button-gradient': 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
             },
             backdropBlur: {
                 xs: '2px',
+                '2xl': '40px',
             },
             animation: {
                 'fade-in': 'fadeIn 0.5s ease-in-out',
                 'slide-up': 'slideUp 0.5s ease-out',
-                'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
                 'float': 'float 6s ease-in-out infinite',
+                'liquid-morph': 'liquidMorph 12s ease-in-out infinite',
             },
             keyframes: {
                 fadeIn: {
@@ -58,16 +105,8 @@ export default {
                     '0%': { transform: 'translateY(20px)', opacity: '0' },
                     '100%': { transform: 'translateY(0)', opacity: '1' },
                 },
-                pulseGlow: {
-                    '0%, 100%': { boxShadow: '0 0 20px rgba(99,102,241,0.3)' },
-                    '50%': { boxShadow: '0 0 40px rgba(99,102,241,0.6)' },
-                },
-                float: {
-                    '0%, 100%': { transform: 'translateY(0px)' },
-                    '50%': { transform: 'translateY(-10px)' },
-                },
-            },
+            }
         },
     },
     plugins: [],
-}
+};

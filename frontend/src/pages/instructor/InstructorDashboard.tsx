@@ -22,7 +22,15 @@ export default function InstructorDashboard() {
     const [form, setForm] = useState({ ...EMPTY_FORM });
     const [paymentDone, setPaymentDone] = useState(false);
 
-    const user = JSON.parse(localStorage.getItem('instructorUser') || '{}');
+    let user: any = {};
+    try {
+        const rawUser = localStorage.getItem('instructorUser');
+        if (rawUser && rawUser !== 'undefined') {
+            user = JSON.parse(rawUser);
+        }
+    } catch {
+        user = {};
+    }
 
     // Redirect if not logged in
     if (!localStorage.getItem('instructorToken')) {
