@@ -43,14 +43,14 @@ interface LiveJob {
 const PLATFORMS: Record<string, { color: string; bg: string; border: string; icon: any; label: string }> = {
     'LinkedIn':    { color: 'text-shade-blue-700', bg: 'bg-shade-blue-500/10', border: 'border-shade-blue-500/25', icon: Briefcase, label: 'LinkedIn' },
     'Indeed':      { color: 'text-shade-blue-700', bg: 'bg-shade-blue-500/10', border: 'border-shade-blue-500/25', icon: Globe, label: 'Indeed' },
-    'Naukri':      { color: 'text-slate-800',      bg: 'bg-slate-100',          border: 'border-slate-200/80',     icon: Layers, label: 'Naukri' },
-    'Glassdoor':   { color: 'text-emerald-700',   bg: 'bg-emerald-500/10',    border: 'border-emerald-500/25',   icon: Star, label: 'Glassdoor' },
+    'Naukri':      { color: 'text-amber-700',      bg: 'bg-amber-500/10',      border: 'border-amber-500/25',     icon: Layers, label: 'Naukri' },
+    'Glassdoor':   { color: 'text-emerald-700',    bg: 'bg-emerald-500/10',    border: 'border-emerald-500/25',   icon: Star, label: 'Glassdoor' },
     'Wellfound':   { color: 'text-shade-red-700',  bg: 'bg-shade-red-500/10',  border: 'border-shade-red-500/25', icon: Zap, label: 'Wellfound' },
     'Internshala': { color: 'text-shade-blue-700', bg: 'bg-shade-blue-500/10', border: 'border-shade-blue-500/25', icon: GraduationCap, label: 'Internshala' },
-    'RemoteOK':    { color: 'text-emerald-700',   bg: 'bg-emerald-500/10',    border: 'border-emerald-500/25',   icon: Globe, label: 'RemoteOK' },
+    'RemoteOK':    { color: 'text-emerald-700',    bg: 'bg-emerald-500/10',    border: 'border-emerald-500/25',   icon: Globe, label: 'RemoteOK' },
     'Adzuna':      { color: 'text-shade-blue-700', bg: 'bg-shade-blue-500/10', border: 'border-shade-blue-500/25', icon: Search, label: 'Adzuna' },
-    'ZipRecruiter':{ color: 'text-emerald-700',   bg: 'bg-emerald-500/10',    border: 'border-emerald-500/25',   icon: Zap, label: 'ZipRecruiter' },
-    'Shine':       { color: 'text-slate-800',      bg: 'bg-slate-100',          border: 'border-slate-200/80',     icon: Sparkles, label: 'Shine' },
+    'ZipRecruiter':{ color: 'text-emerald-700',    bg: 'bg-emerald-500/10',    border: 'border-emerald-500/25',   icon: Zap, label: 'ZipRecruiter' },
+    'Shine':       { color: 'text-purple-600',     bg: 'bg-purple-500/10',     border: 'border-purple-500/25',    icon: Sparkles, label: 'Shine' },
     'Foundit':     { color: 'text-shade-blue-700', bg: 'bg-shade-blue-500/10', border: 'border-shade-blue-500/25', icon: Target, label: 'Foundit' },
     'Monster':     { color: 'text-shade-red-700',  bg: 'bg-shade-red-500/10',  border: 'border-shade-red-500/25', icon: Bot, label: 'Monster' },
 };
@@ -59,19 +59,19 @@ const getPlatformStyle = (source: string) => {
     for (const [key, style] of Object.entries(PLATFORMS)) {
         if (source?.includes(key)) return style;
     }
-    return { color: 'text-slate-700', bg: 'bg-slate-100', border: 'border-slate-200/80', icon: Building2, label: source };
+    return { color: 'text-shade-blue-600', bg: 'bg-shade-blue-500/10', border: 'border-shade-blue-500/20', icon: Building2, label: source };
 };
 
 const getMatchColor = (score: number) => {
-    if (score >= 75) return 'text-emerald-700';
-    if (score >= 50) return 'text-amber-700';
-    return 'text-shade-red-700';
+    if (score >= 75) return 'text-emerald-600';
+    if (score >= 50) return 'text-amber-600';
+    return 'text-shade-red-600';
 };
 
 const getMatchBg = (score: number) => {
-    if (score >= 75) return 'from-emerald-50 to-teal-100/70 border-emerald-500/30';
-    if (score >= 50) return 'from-amber-50 to-orange-100/70 border-amber-500/30';
-    return 'from-red-50 to-rose-100/70 border-shade-red-500/30';
+    if (score >= 75) return 'border-emerald-500/30 bg-emerald-500/10';
+    if (score >= 50) return 'border-amber-500/30 bg-amber-500/10';
+    return 'border-shade-red-500/30 bg-shade-red-500/10';
 };
 
 // ─── Platform overview banner ─────────────────────────────────────────────────
@@ -84,7 +84,7 @@ const PlatformBanner = ({ sources }: { sources: string[] }) => {
             className="glass-card p-4 shadow-sm border-slate-200/80"
         >
             <div className="flex items-center gap-3 flex-wrap">
-                <div className="flex items-center gap-2 text-slate-600 text-xs font-semibold mr-2">
+                <div className="flex items-center gap-2 text-xs font-semibold mr-2" style={{ color: 'var(--text-body)' }}>
                     <Layers className="w-3.5 h-3.5 text-shade-blue-600" />
                     <span>Sources searched:</span>
                 </div>
@@ -116,8 +116,8 @@ const AgentThinkingState = ({ queries }: { queries: string[] }) => (
         </div>
 
         <div>
-            <h2 className="text-xl font-bold text-slate-900">AI Job Agent is Scraping Live Roles</h2>
-            <p className="text-slate-600 text-sm mt-1 font-medium">Scanning LinkedIn, Naukri, Indeed, Glassdoor & Wellfound...</p>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>AI Job Agent is Scraping Live Roles</h2>
+            <p className="text-sm mt-1 font-medium" style={{ color: 'var(--text-body)' }}>Scanning LinkedIn, Naukri, Indeed, Glassdoor & Wellfound...</p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2">
@@ -140,10 +140,10 @@ const EmptyState = ({ hasResume, onSearch, isSearching }: { hasResume: boolean; 
             </div>
 
             <div>
-                <h2 className="text-xl font-bold text-slate-900">
+                <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     {hasResume ? 'Launch Your AI Job Search' : 'Upload Resume First'}
                 </h2>
-                <p className="text-slate-600 text-sm mt-1 font-medium">
+                <p className="text-sm mt-1 font-medium" style={{ color: 'var(--text-body)' }}>
                     {hasResume
                         ? 'Our AI agent will scan major job portals and extract roles that explicitly accept career-gap candidates.'
                         : 'Upload your PDF resume so our AI can extract your skills and search matching gap-friendly jobs.'
@@ -270,17 +270,17 @@ export default function AgentDashboard() {
     );
 
     return (
-        <div className="p-6 lg:p-8 space-y-6 text-slate-900">
+        <div className="p-6 lg:p-8 space-y-6" style={{ color: 'var(--text-primary)' }}>
             {/* Header */}
             <div className="flex items-start justify-between flex-wrap gap-4">
                 <div>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+                    <h1 className="text-2xl lg:text-3xl font-bold flex items-center gap-3" style={{ color: 'var(--text-primary)' }}>
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-shade-blue-600 to-shade-blue-700 flex items-center justify-center shadow-md shadow-shade-blue-500/20">
                             <Bot className="w-6 h-6 text-white" />
                         </div>
                         AI Career Agent
                     </h1>
-                    <p className="text-slate-600 mt-1 font-medium">
+                    <p className="mt-1 font-medium" style={{ color: 'var(--text-body)' }}>
                         Searches LinkedIn, Naukri, Indeed, Glassdoor, RemoteOK, Wellfound, Internshala & more
                     </p>
                 </div>
@@ -333,7 +333,7 @@ export default function AgentDashboard() {
                             </div>
                             <div>
                                 <p className={`text-2xl font-black ${color}`}>{value}</p>
-                                <p className="text-slate-600 text-xs font-semibold">{label}</p>
+                                <p className="text-xs font-semibold" style={{ color: 'var(--text-body)' }}>{label}</p>
                             </div>
                         </div>
                     ))}
@@ -350,7 +350,7 @@ export default function AgentDashboard() {
                 <div className="glass-card p-4 flex flex-wrap gap-3 items-end shadow-sm border-slate-200/80">
                     <div className="flex-1 min-w-48">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-muted)' }} />
                             <input
                                 type="text"
                                 className="input-field pl-9 py-2 text-sm font-medium"
@@ -364,7 +364,7 @@ export default function AgentDashboard() {
                     {/* Platform / Source Filter */}
                     <div>
                         <select
-                            className="input-field py-2 text-sm font-medium bg-white"
+                            className="input-field py-2 text-sm font-medium"
                             value={filters.source}
                             onChange={e => setFilters(f => ({ ...f, source: e.target.value }))}
                         >
@@ -389,7 +389,7 @@ export default function AgentDashboard() {
 
                     <div>
                         <select
-                            className="input-field py-2 text-sm font-medium bg-white"
+                            className="input-field py-2 text-sm font-medium"
                             value={filters.minMatch}
                             onChange={e => setFilters(f => ({ ...f, minMatch: Number(e.target.value) }))}
                         >
@@ -406,16 +406,17 @@ export default function AgentDashboard() {
                             onClick={() => setShowLiveOnly(!showLiveOnly)}
                             className={`flex items-center gap-2 text-xs px-3 py-2 rounded-lg border font-bold transition-all ${
                                 showLiveOnly
-                                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-700'
-                                    : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900'
+                                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600'
+                                    : 'border font-bold'
                             }`}
+                            style={!showLiveOnly ? { backgroundColor: 'var(--bg-hover)', borderColor: 'var(--border-input)', color: 'var(--text-body)' } : {}}
                         >
                             <Radio className="w-3.5 h-3.5" />
                             Live Only
                         </button>
                     )}
 
-                    <p className="text-slate-600 text-sm font-semibold ml-auto">{filtered.length} results</p>
+                    <p className="text-sm font-semibold ml-auto" style={{ color: 'var(--text-body)' }}>{filtered.length} results</p>
                 </div>
             )}
 
@@ -454,7 +455,8 @@ export default function AgentDashboard() {
 
                                     <div className="flex gap-4 p-5">
                                         {/* Company Logo / Platform Icon */}
-                                        <div className="w-12 h-12 rounded-xl border border-slate-200/80 flex items-center justify-center text-xl flex-shrink-0 bg-slate-100 shadow-sm">
+                                        <div className="w-12 h-12 rounded-xl border flex items-center justify-center text-xl flex-shrink-0 shadow-sm"
+                                            style={{ backgroundColor: 'var(--bg-hover)', borderColor: 'var(--border-color)' }}>
                                             {typeof platformStyle.icon === 'string' ? (
                                                 platformStyle.icon
                                             ) : (
@@ -466,27 +468,27 @@ export default function AgentDashboard() {
                                             <div className="flex items-start justify-between gap-3 flex-wrap">
                                                 <div>
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <h3 className="text-slate-900 font-bold text-lg leading-tight">{job.title}</h3>
+                                                        <h3 className="font-bold text-lg leading-tight" style={{ color: 'var(--text-primary)' }}>{job.title}</h3>
                                                         {job.isLive && (
                                                             <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 border border-emerald-500/25 font-black tracking-wide">
                                                                 LIVE
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <p className="text-slate-600 text-sm mt-0.5 font-bold">{job.company}</p>
+                                                    <p className="text-sm mt-0.5 font-bold" style={{ color: 'var(--text-body)' }}>{job.company}</p>
                                                 </div>
 
                                                 {/* Match Score */}
-                                                <div className={`flex flex-col items-end flex-shrink-0 bg-gradient-to-br ${getMatchBg(job.matchScore)} border rounded-xl px-3 py-2 min-w-16 shadow-sm`}>
+                                                <div className={`flex flex-col items-end flex-shrink-0 border rounded-xl px-3 py-2 min-w-16 shadow-sm ${getMatchBg(job.matchScore)}`}>
                                                     <p className={`text-xl font-black ${getMatchColor(job.matchScore)}`}>
                                                         {job.matchScore}%
                                                     </p>
-                                                    <p className="text-slate-600 text-[10px] font-black uppercase tracking-wider">match</p>
+                                                    <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: 'var(--text-body)' }}>match</p>
                                                 </div>
                                             </div>
 
                                             {/* Metadata row */}
-                                            <div className="flex flex-wrap gap-3 mt-3 text-sm text-slate-600 font-medium">
+                                            <div className="flex flex-wrap gap-3 mt-3 text-sm font-medium" style={{ color: 'var(--text-body)' }}>
                                                 {job.location && (
                                                     <span className="flex items-center gap-1">
                                                         <MapPin className="w-3.5 h-3.5 text-shade-blue-600" /> {job.location}
@@ -538,7 +540,7 @@ export default function AgentDashboard() {
                                                         initial={{ opacity: 0, height: 0 }}
                                                         animate={{ opacity: 1, height: 'auto' }}
                                                         exit={{ opacity: 0, height: 0 }}
-                                                        className="text-slate-700 text-sm mt-3 leading-relaxed font-medium"
+                                                        className="text-sm mt-3 leading-relaxed font-medium" style={{ color: 'var(--text-body)' }}
                                                     >
                                                         {job.description}
                                                     </motion.p>
@@ -574,7 +576,7 @@ export default function AgentDashboard() {
                     {filtered.length === 0 && (
                         <div className="glass-card p-12 text-center shadow-sm border-slate-200/80">
                             <Search className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                            <p className="text-slate-600 font-semibold">No jobs match your filters. Try adjusting the criteria.</p>
+                            <p className="font-semibold" style={{ color: 'var(--text-body)' }}>No jobs match your filters. Try adjusting the criteria.</p>
                         </div>
                     )}
                 </div>
@@ -582,7 +584,7 @@ export default function AgentDashboard() {
 
             {/* Last searched footer */}
             {lastSearched && jobs.length > 0 && (
-                <p className="text-slate-500 text-xs text-center font-medium">
+                <p className="text-xs text-center font-medium" style={{ color: 'var(--text-muted)' }}>
                     Last updated: {formatDate(lastSearched)} · {jobs.length} jobs from {uniqueSources.length} platforms
                     {liveJobs.length > 0 && ` · ${liveJobs.length} live results`}
                 </p>

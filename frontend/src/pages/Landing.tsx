@@ -4,6 +4,7 @@ import {
     Sparkles, Target, Shield, TrendingUp, Users, Building2,
     ArrowRight, CheckCircle, Brain, FileSearch, BarChart3, BookOpen, ChevronRight, DollarSign
 } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 const features = [
     { icon: Brain, title: 'AI Resume Analysis', desc: 'GPT-4 powered analysis extracts skills, detects gaps, and calculates your resume score automatically.' },
@@ -23,26 +24,28 @@ const stats = [
 
 export default function Landing() {
     return (
-        <div className="min-h-screen bg-[#faf8f5] text-[#0b0d11] relative overflow-hidden">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}>
             {/* Ambient liquid backdrop orbs */}
             <div className="liquid-orb-blue top-10 left-1/4" />
             <div className="liquid-orb-red top-60 right-1/4" />
             <div className="liquid-orb-ivory bottom-40 left-1/3" />
 
             {/* Navbar */}
-            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 backdrop-blur-2xl bg-[#fffdfa]/85 border-b border-[#eae6dc] shadow-sm">
+            <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 backdrop-blur-2xl shadow-sm"
+                style={{ backgroundColor: 'var(--bg-nav)', borderBottom: '1px solid var(--border-sidebar)' }}>
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-shade-blue-600 to-shade-blue-700 flex items-center justify-center shadow-md shadow-shade-blue-500/20 border border-white/40">
                             <Sparkles className="w-5 h-5 text-white" />
                         </div>
-                        <span className="font-bold text-lg tracking-wide text-[#0b0d11]">Career Gap Finder</span>
+                        <span className="font-bold text-lg tracking-wide" style={{ color: 'var(--text-primary)' }}>Career Gap Finder</span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                         <Link to="/instructor" className="btn-ghost text-sm flex items-center gap-1.5 text-shade-blue-600 hover:text-shade-blue-700 font-semibold">
                             <BookOpen className="w-4 h-4" /> Teach on Platform
                         </Link>
-                        <Link to="/login" className="btn-ghost text-sm text-[#4a5568] hover:text-[#0b0d11] font-medium">Sign In</Link>
+                        <Link to="/login" className="btn-ghost text-sm font-medium" style={{ color: 'var(--text-body)' }}>Sign In</Link>
+                        <ThemeToggle variant="icon" />
                         <Link to="/register" className="btn-primary text-sm py-2 px-5 shadow-lg shadow-shade-blue-500/25">Get Started Free</Link>
                     </div>
                 </div>
@@ -61,12 +64,12 @@ export default function Landing() {
                             <span>AI-Powered Career Gap Solution</span>
                         </div>
 
-                        <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight text-[#0b0d11]">
+                        <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight" style={{ color: 'var(--text-primary)' }}>
                             Your Career Gap{' '}
                             <span className="gradient-text">Is Not a Deal-Breaker</span>
                         </h1>
 
-                        <p className="text-xl text-[#4a5568] max-w-3xl mx-auto mb-10 leading-relaxed font-normal">
+                        <p className="text-xl max-w-3xl mx-auto mb-10 leading-relaxed font-normal" style={{ color: 'var(--text-body)' }}>
                             We connect students and gap professionals with companies that actively welcome them.
                             Upload your resume, get AI analysis, and find your perfect match in minutes.
                         </p>
@@ -87,7 +90,7 @@ export default function Landing() {
                         className="mt-16 glass-card p-6 max-w-2xl mx-auto text-left shadow-lg relative overflow-hidden"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <p className="text-[#181d27] text-sm font-semibold flex items-center gap-2">
+                            <p className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                                 <Brain className="w-4 h-4 text-shade-blue-600" /> AI Resume Analysis
                             </p>
                             <span className="badge-blue">Analyzing...</span>
@@ -100,8 +103,8 @@ export default function Landing() {
                             ].map(({ label, value, color }) => (
                                 <div key={label}>
                                     <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-[#4a5568] font-medium">{label}</span>
-                                        <span className="text-[#0b0d11] font-bold">{value}%</span>
+                                        <span className="font-medium" style={{ color: 'var(--text-body)' }}>{label}</span>
+                                        <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{value}%</span>
                                     </div>
                                     <div className="progress-bar">
                                         <motion.div
@@ -114,7 +117,7 @@ export default function Landing() {
                                 </div>
                             ))}
                         </div>
-                        <div className="mt-5 pt-4 border-t border-[#eae6dc] flex gap-2 flex-wrap">
+                        <div className="mt-5 pt-4 flex gap-2 flex-wrap" style={{ borderTop: '1px solid var(--border-color)' }}>
                             {['React', 'Python', 'Machine Learning', 'Node.js', 'SQL'].map(s => (
                                 <span key={s} className="badge-blue">{s}</span>
                             ))}
@@ -124,7 +127,7 @@ export default function Landing() {
             </section>
 
             {/* Stats */}
-            <section className="py-16 px-6 border-y border-[#eae6dc] bg-[#fffdfa]/75 backdrop-blur-xl relative z-10">
+            <section className="py-16 px-6 relative z-10" style={{ borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)' }}>
                 <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
                     {stats.map(({ label, value }, i) => (
                         <motion.div
@@ -135,7 +138,7 @@ export default function Landing() {
                             className="text-center"
                         >
                             <p className="text-4xl font-black gradient-text mb-2 tracking-tight">{value}</p>
-                            <p className="text-[#4a5568] text-sm font-semibold">{label}</p>
+                            <p className="text-sm font-semibold" style={{ color: 'var(--text-body)' }}>{label}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -145,8 +148,8 @@ export default function Landing() {
             <section className="py-24 px-6 relative z-10">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold mb-4 text-[#0b0d11]">Everything You Need to <span className="gradient-text">Get Hired</span></h2>
-                        <p className="text-[#4a5568] text-lg font-medium">A complete platform built specifically for career gap candidates</p>
+                        <h2 className="text-4xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Everything You Need to <span className="gradient-text">Get Hired</span></h2>
+                        <p className="text-lg font-medium" style={{ color: 'var(--text-body)' }}>A complete platform built specifically for career gap candidates</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -161,8 +164,8 @@ export default function Landing() {
                                 <div className="w-12 h-12 rounded-xl bg-shade-blue-500/10 border border-shade-blue-500/20 flex items-center justify-center mb-4 group-hover:bg-shade-blue-500/20 transition-colors shadow-sm">
                                     <Icon className="w-6 h-6 text-shade-blue-600" />
                                 </div>
-                                <h3 className="text-[#0b0d11] font-bold text-lg mb-2">{title}</h3>
-                                <p className="text-[#4a5568] text-sm leading-relaxed">{desc}</p>
+                                <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+                                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-body)' }}>{desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -170,7 +173,7 @@ export default function Landing() {
             </section>
 
             {/* Instructor CTA Section */}
-            <section className="py-20 px-6 bg-[#f5f2eb]/70 relative z-10">
+            <section className="py-20 px-6 relative z-10" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <div className="max-w-6xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -182,13 +185,13 @@ export default function Landing() {
                                 <BookOpen className="w-8 h-8 text-shade-blue-600" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-[#0b0d11] mb-2">Are You an Expert? <span className="text-shade-blue-600">Teach on Our Platform</span></h2>
-                                <p className="text-[#4a5568] max-w-lg leading-relaxed text-sm">
+                                <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Are You an Expert? <span className="text-shade-blue-600">Teach on Our Platform</span></h2>
+                                <p className="max-w-lg leading-relaxed text-sm" style={{ color: 'var(--text-body)' }}>
                                     Share your knowledge with thousands of career-seekers. Upload courses, earn revenue, and help people land their dream jobs.
                                 </p>
                                 <div className="flex flex-wrap gap-4 mt-4">
                                     {[{ icon: DollarSign, text: 'Earn per enrollment' }, { icon: Users, text: 'Reach 12K+ learners' }, { icon: CheckCircle, text: 'Admin quality seal' }].map(({ icon: Icon, text }) => (
-                                        <span key={text} className="flex items-center gap-1.5 text-xs text-[#4a5568] font-semibold">
+                                        <span key={text} className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: 'var(--text-body)' }}>
                                             <Icon className="w-4 h-4 text-shade-blue-600" /> {text}
                                         </span>
                                     ))}
@@ -210,8 +213,8 @@ export default function Landing() {
                 <div className="max-w-3xl mx-auto glass-card p-12 relative overflow-hidden shadow-lg">
                     <div className="relative z-10">
                         <Sparkles className="w-12 h-12 text-shade-blue-600 mx-auto mb-6" />
-                        <h2 className="text-4xl font-bold mb-4 text-[#0b0d11]">Ready to Find Your Job?</h2>
-                        <p className="text-[#4a5568] mb-8 max-w-xl mx-auto font-medium">Join thousands of gap candidates who found their dream jobs through our platform.</p>
+                        <h2 className="text-4xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Ready to Find Your Job?</h2>
+                        <p className="mb-8 max-w-xl mx-auto font-medium" style={{ color: 'var(--text-body)' }}>Join thousands of gap candidates who found their dream jobs through our platform.</p>
                         <Link to="/register" className="btn-primary inline-flex items-center gap-2 text-base px-10 py-4 shadow-xl shadow-shade-blue-500/25">
                             Create Free Account
                             <ArrowRight className="w-5 h-5" />
@@ -221,7 +224,7 @@ export default function Landing() {
             </section>
 
             {/* Footer */}
-            <footer className="py-8 px-6 border-t border-[#eae6dc] text-center text-[#6c788d] text-sm relative z-10">
+            <footer className="py-8 px-6 text-center text-sm relative z-10" style={{ borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
                 <p>© 2026 Career Gap Job Finder. Built for gap professionals.</p>
             </footer>
         </div>

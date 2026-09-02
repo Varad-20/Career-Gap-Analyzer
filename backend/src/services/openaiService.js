@@ -79,23 +79,27 @@ Rules:
 
     // Domain detection keyword map
     const domainKeywords = {
-        'AI/ML': ['machine learning', 'deep learning', 'neural network', 'tensorflow', 'pytorch', 'nlp', 'computer vision', 'scikit', 'keras', 'llm', 'generative ai', 'huggingface'],
-        'Data Science': ['data science', 'data analysis', 'pandas', 'numpy', 'matplotlib', 'seaborn', 'statistics', 'tableau', 'power bi', 'r language', 'jupyter'],
-        'Web Development': ['react', 'angular', 'vue', 'html', 'css', 'javascript', 'typescript', 'next.js', 'tailwind', 'frontend', 'web developer'],
-        'Full Stack': ['full stack', 'fullstack', 'node.js', 'express', 'mongodb', 'rest api', 'graphql'],
-        'Backend Development': ['spring boot', 'django', 'flask', 'fastapi', 'microservices', 'postgresql', 'mysql', 'redis'],
-        'Mobile Development': ['android', 'ios', 'react native', 'flutter', 'kotlin', 'swift', 'xamarin'],
-        'DevOps/Cloud': ['docker', 'kubernetes', 'aws', 'azure', 'gcp', 'ci/cd', 'jenkins', 'terraform', 'ansible', 'devops'],
-        'Data Engineering': ['spark', 'hadoop', 'kafka', 'airflow', 'etl', 'data pipeline', 'bigquery', 'snowflake'],
-        'UI/UX Design': ['figma', 'ux design', 'ui design', 'wireframe', 'prototyping', 'user research', 'adobe xd'],
-        'Cybersecurity': ['cybersecurity', 'penetration testing', 'ethical hacking', 'network security', 'siem', 'firewalls'],
+        'AI/ML': ['machine learning', 'deep learning', 'neural network', 'tensorflow', 'pytorch', 'nlp', 'computer vision', 'scikit', 'keras', 'llm', 'generative ai', 'huggingface', 'artificial intelligence', 'model', 'python', 'ai'],
+        'Data Science': ['data science', 'data analysis', 'pandas', 'numpy', 'matplotlib', 'seaborn', 'statistics', 'tableau', 'power bi', 'r language', 'jupyter', 'data analyst', 'sql', 'data'],
+        'Web Development': ['react', 'angular', 'vue', 'html', 'css', 'javascript', 'typescript', 'next.js', 'tailwind', 'frontend', 'web developer', 'web development'],
+        'Full Stack': ['full stack', 'fullstack', 'node.js', 'express', 'mongodb', 'rest api', 'graphql', 'mern', 'mean'],
+        'Backend Development': ['spring boot', 'django', 'flask', 'fastapi', 'microservices', 'postgresql', 'mysql', 'redis', 'backend', 'api'],
+        'Mobile Development': ['android', 'ios', 'react native', 'flutter', 'kotlin', 'swift', 'xamarin', 'mobile app'],
+        'DevOps/Cloud': ['docker', 'kubernetes', 'aws', 'azure', 'gcp', 'ci/cd', 'jenkins', 'terraform', 'ansible', 'devops', 'cloud'],
+        'Data Engineering': ['spark', 'hadoop', 'kafka', 'airflow', 'etl', 'data pipeline', 'bigquery', 'snowflake', 'data engineering'],
+        'UI/UX Design': ['figma', 'ux design', 'ui design', 'wireframe', 'prototyping', 'user research', 'adobe xd', 'ui/ux'],
+        'Cybersecurity': ['cybersecurity', 'penetration testing', 'ethical hacking', 'network security', 'siem', 'firewalls', 'security'],
     };
 
     // Detect domain by counting keyword matches
     let bestDomain = 'Other';
     let bestScore = 0;
     for (const [domain, keywords] of Object.entries(domainKeywords)) {
-        const score = keywords.filter(k => textLower.includes(k)).length;
+        // Use word boundaries for precise matching where possible, but allow partial for others
+        const score = keywords.filter(k => {
+             const regex = new RegExp('\\b' + k.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '\\b', 'i');
+             return regex.test(textLower);
+        }).length;
         if (score > bestScore) { bestScore = score; bestDomain = domain; }
     }
 
@@ -110,6 +114,7 @@ Rules:
         'machine learning', 'deep learning', 'nlp', 'computer vision',
         'react native', 'flutter', 'kotlin', 'swift',
         'figma', 'sql', 'graphql', 'rest api', 'microservices',
+        'keras', 'tableau', 'power bi', 'ansible', 'terraform', 'jenkins'
     ];
 
     const extractedSkills = commonSkills.filter(skill => {
@@ -172,7 +177,25 @@ Rules:
         primaryRole: 'Software Engineer',
     };
 
-    const gapDuration = (textLower.includes('career gap') || textLower.includes('employment gap') || textLower.includes('career break')) ? 6 : 0;
+    let gapDuration = 0;
+    if (textLower.includes('career gap') || textLower.includes('employment gap') || textLower.includes('career break')) {
+        // Try to extract a number near "gap" or "break"
+        const gapMatch = textLower.match(/(\d+)\s*(?:month|year|mo|yr)s?\s*(?:career gap|employment gap|career break|gap|break)/i) || 
+                         textLower.match(/(?:career gap|employment gap|career break|gap|break)\s*(?:of|for)?\s*(\d+)\s*(?:month|year|mo|yr)s?/i);
+        
+        if (gapMatch && gapMatch[1]) {
+            gapDuration = parseInt(gapMatch[1], 10);
+            // If the matched number is a year (e.g. 1 year), convert to months, but for simplicity let's assume it matches exactly.
+            if (gapMatch[0].includes('year') || gapMatch[0].includes('yr')) {
+                gapDuration *= 12;
+            }
+        } else if (textLower.includes('0 month') || textLower.includes('no career gap') || textLower.includes('0 gap')) {
+            gapDuration = 0;
+        } else {
+            gapDuration = 6; // Default fallback if mentioned but no number found
+        }
+    }
+    
     const gapRiskLevel = gapDuration > 12 ? 'High' : gapDuration > 6 ? 'Medium' : 'Low';
     let resumeScore = 40;
     if (resumeText.length > 500) resumeScore += 10;

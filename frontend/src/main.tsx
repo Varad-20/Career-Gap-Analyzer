@@ -80,10 +80,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         position="top-right"
                         toastOptions={{
                             style: {
-                                background: '#12151c',
-                                color: '#f5f3ef',
-                                border: '1px solid rgba(245, 243, 239, 0.1)',
+                                background: document.documentElement.classList.contains('dark')
+                                    ? '#141720'
+                                    : '#fffdfa',
+                                color: document.documentElement.classList.contains('dark')
+                                    ? '#f0ede8'
+                                    : '#0b0d11',
+                                border: document.documentElement.classList.contains('dark')
+                                    ? '1px solid rgba(40,47,65,0.9)'
+                                    : '1px solid rgba(220,214,200,0.8)',
                                 borderRadius: '12px',
+                                boxShadow: document.documentElement.classList.contains('dark')
+                                    ? '0 8px 32px rgba(0,0,0,0.4)'
+                                    : '0 8px 32px rgba(15,23,42,0.08)',
                             },
                             success: { iconTheme: { primary: '#3b82f6', secondary: '#fff' } },
                             error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },

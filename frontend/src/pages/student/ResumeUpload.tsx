@@ -102,6 +102,7 @@ export default function ResumeUpload() {
             queryClient.invalidateQueries({ queryKey: ['agent-status'] });
             queryClient.invalidateQueries({ queryKey: ['skill-gap'] });
             queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
 
             const domainMsg = analysisData.domain ? `Domain detected: ${analysisData.domain}` : 'Resume analyzed';
             const roleMsg = analysisData.primaryRole ? ` — Searching ${analysisData.primaryRole} jobs!` : ' successfully!';

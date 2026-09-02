@@ -51,6 +51,10 @@ exports.searchJobs = async (req, res) => {
         const student = await Student.findById(req.user._id);
         if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
 
+        if (!student.resumeURL) {
+            return res.status(400).json({ success: false, message: 'Please upload a resume first' });
+        }
+
         const studentProfile = buildStudentProfile(student);
 
         console.log(`🔍 Triggering multi-platform job search for student ${req.user._id}`);
@@ -85,9 +89,20 @@ exports.searchJobs = async (req, res) => {
 exports.getJobResults = async (req, res) => {
     try {
         const student = await Student.findById(req.user._id)
-            .select('liveJobResults lastJobSearchAt skills suggestedRoles location gapDuration resumeAnalysis');
+            .select('liveJobResults lastJobSearchAt resumeURL skills suggestedRoles location gapDuration resumeAnalysis');
 
         if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
+
+        if (!student.resumeURL) {
+            return res.json({
+                success: true,
+                count: 0,
+                jobs: [],
+                isStale: false,
+                searchedAt: null,
+                isMock: false
+            });
+        }
 
         let jobs = student.liveJobResults || [];
 

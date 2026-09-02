@@ -5,6 +5,7 @@ import { Sparkles, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { authAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import ThemeToggle from '../../components/ThemeToggle';
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -40,7 +41,13 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-[#faf8f5] flex items-center justify-center p-6 relative overflow-hidden text-slate-900">
+        <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+            style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}>
+            {/* Theme toggle — top right */}
+            <div className="absolute top-5 right-5 z-20">
+                <ThemeToggle variant="icon" />
+            </div>
+
             {/* Ambient liquid backdrop orbs */}
             <div className="liquid-orb-blue top-20 left-1/4 opacity-40" />
             <div className="liquid-orb-red bottom-20 right-1/4 opacity-30" />
@@ -56,20 +63,20 @@ export default function Login() {
                         <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-shade-blue-600 to-shade-blue-700 flex items-center justify-center shadow-md shadow-shade-blue-500/25 border border-shade-blue-500/30">
                             <Sparkles className="w-6 h-6 text-white" />
                         </div>
-                        <span className="text-slate-900 font-black text-2xl tracking-tight">Career Gap Finder</span>
+                        <span className="font-black text-2xl tracking-tight" style={{ color: 'var(--text-primary)' }}>Career Gap Finder</span>
                     </Link>
-                    <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome Back</h2>
-                    <p className="text-slate-600 mt-2 text-sm font-semibold">Sign in to your account</p>
+                    <h2 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>Welcome Back</h2>
+                    <p className="mt-2 text-sm font-semibold" style={{ color: 'var(--text-body)' }}>Sign in to your account</p>
                 </div>
 
-                <div className="glass-card p-8 shadow-xl border-slate-200/80 bg-[#fffdfa]/90">
+                <div className="glass-card p-8 shadow-xl">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="label text-slate-700 font-bold text-sm">Email Address</label>
+                            <label className="label">Email Address</label>
                             <input
                                 id="login-email"
                                 type="email"
-                                className="input-field text-slate-900 font-medium"
+                                className="input-field font-medium"
                                 placeholder="you@example.com"
                                 value={form.email}
                                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
@@ -78,19 +85,20 @@ export default function Login() {
                         </div>
 
                         <div>
-                            <label className="label text-slate-700 font-bold text-sm">Password</label>
+                            <label className="label">Password</label>
                             <div className="relative">
                                 <input
                                     id="login-password"
                                     type={showPassword ? 'text' : 'password'}
-                                    className="input-field pr-12 text-slate-900 font-medium"
+                                    className="input-field pr-12 font-medium"
                                     placeholder="••••••••"
                                     value={form.password}
                                     onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                                     required
                                 />
                                 <button type="button" onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                                    style={{ color: 'var(--text-muted)' }}
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
@@ -112,20 +120,20 @@ export default function Login() {
                     </form>
 
                     <div className="mt-6 text-center space-y-3">
-                        <p className="text-slate-600 text-sm font-medium">
+                        <p className="text-sm font-medium" style={{ color: 'var(--text-body)' }}>
                             Don't have an account?{' '}
-                            <Link to="/register" className="text-shade-blue-600 hover:text-shade-blue-700 font-bold">
+                            <Link to="/register" className="text-shade-blue-600 hover:text-shade-blue-500 font-bold">
                                 Sign up free
                             </Link>
                         </p>
-                        <p className="text-slate-500 text-xs font-semibold">
+                        <p className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>
                             Admin?{' '}
                             <button
                                 onClick={() => {
                                     setForm({ email: 'admin@careergap.com', password: 'Admin@123' });
                                     toast.success('Admin credentials filled — click Sign In');
                                 }}
-                                className="text-shade-red-600 hover:text-shade-red-700 font-bold"
+                                className="text-shade-red-500 hover:text-shade-red-400 font-bold"
                             >
                                 Fill Admin Login
                             </button>
